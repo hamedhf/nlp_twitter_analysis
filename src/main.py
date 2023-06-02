@@ -9,6 +9,7 @@ from selenium import webdriver
 from utils.clean import clean_text
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_api_key, get_crawled_tweets
+from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
 
 app = typer.Typer()
 logger = None
@@ -140,6 +141,46 @@ def clean_data(path_to_labeled_csv: str):
 
     logger.info("Cleaned data saved in {}".format(clean_file_path))
     logger.info("Cleaned data with punctuation saved in {}".format(punc_file_path))
+
+
+@app.command()
+def break_by_word(path_to_clean_csv: str):
+    logger.info("Breaking data by word...")
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError("clean.csv not found. Please provide a valid csv file or run clean_data first.")
+    with open(path_to_clean_csv, 'r') as f:
+        lines = f.readlines()
+    date = os.path.basename(path_to_clean_csv).split('_')[-1]
+    word_file_path = '../data/wordbroken/wordbroken_{}'.format(date)
+    tweets: list[list[str]] = [
+        simple_word_tokenizer(line.split(',')[2]) for line in lines[1:]
+    ]
+    max_len = max([len(tweet) for tweet in tweets])
+    tweets = [pad_list(tweet, max_len) for tweet in tweets]
+    with open(word_file_path, 'w') as f:
+        for tweet in tweets:
+            f.write("{}\n".format(','.join(tweet)))
+
+
+@app.command()
+def break_by_sentence(path_to_punc_csv: str):
+    logger.info("Breaking data by sentence...")
+    # check punc.csv exists
+    if not os.path.exists(path_to_punc_csv):
+        raise FileNotFoundError("punc.csv not found. Please provide a valid csv file or run clean_data first.")
+    with open(path_to_punc_csv, 'r') as f:
+        lines = f.readlines()
+    date = os.path.basename(path_to_punc_csv).split('_')[-1]
+    sentence_file_path = '../data/sentencebroken/sentencebroken_{}'.format(date)
+    tweets: list[list[str]] = [
+        simple_sentence_tokenizer(line.split(',')[2]) for line in lines[1:]
+    ]
+    max_len = max([len(tweet) for tweet in tweets])
+    tweets = [pad_list(tweet, max_len) for tweet in tweets]
+    with open(sentence_file_path, 'w') as f:
+        for tweet in tweets:
+            f.write("{}\n".format(','.join(tweet)))
 
 
 if __name__ == "__main__":

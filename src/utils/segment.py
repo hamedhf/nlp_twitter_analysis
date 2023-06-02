@@ -1,4 +1,4 @@
-from hazm import word_tokenize, lemmatizer, stemmer
+from hazm import word_tokenize, lemmatizer, stemmer, sent_tokenize
 
 
 def complex_word_tokenizer(text) -> list[str]:
@@ -11,12 +11,20 @@ def complex_word_tokenizer(text) -> list[str]:
     return words
 
 
-def simple_word_tokenizer(text) -> list[str]:
+def simple_word_tokenizer(text: str) -> list[str]:
     return word_tokenize(text)
 
 
-# def sentence_tokenizer(text):
-#     return sentence_tokenize(text)
+def pad_list(input_list: list[str], max_length) -> list[str]:
+    return input_list + ['PAD'] * (max_length - len(input_list))
+
+
+def simple_sentence_tokenizer(text: str) -> list[str]:
+    """
+    input text must have punctuation.
+    """
+    sentences = sent_tokenize(text)
+    return sentences
 
 
 if __name__ == "__main__":
@@ -30,3 +38,5 @@ if __name__ == "__main__":
 
     print(simple_word_tokenizer('من می‌روم کتاب‌ها را می‌خوانم'))
     print(complex_word_tokenizer('من می‌روم کتاب‌ها را می‌خوانم'))
+
+    print(simple_sentence_tokenizer('من می‌روم. کتاب‌ها را می‌خوانم.'))
