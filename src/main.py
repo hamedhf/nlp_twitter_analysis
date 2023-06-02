@@ -40,6 +40,9 @@ def check_necessary_files():
     if not os.path.exists('../data/sentencebroken'):
         os.mkdir('../data/sentencebroken')
 
+    if not os.path.exists('../stats'):
+        os.mkdir('../stats')
+
     if not os.path.exists('./users.csv'):
         raise FileNotFoundError("users.csv not found. Please create it.")
 
