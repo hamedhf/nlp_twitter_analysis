@@ -6,6 +6,7 @@ import typer
 from dotenv import load_dotenv
 from selenium import webdriver
 
+from utils.cleaning import clean_text
 from utils.crawling import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.labeling import get_tweet_label, get_api_key, get_crawled_tweets
 
@@ -87,12 +88,12 @@ def label_data():
 
     # label tweets
     for tweet in tweets:
-        tweet_time = tweet[0]
-        tweet_owner = tweet[1]
-        tweet_text = tweet[2]
-        owner_university = tweet[3]
-        owner_name = tweet[4]
-        label = get_tweet_label(api_key, tweet_text)
+        tweet_time = tweet[0].strip()
+        tweet_owner = tweet[1].strip()
+        tweet_text: str = tweet[2].replace('\n', ' ').replace('\r', ' ').replace(',', ' ').strip()
+        owner_university = tweet[3].strip()
+        owner_name = tweet[4].strip()
+        label = get_tweet_label(api_key, tweet_text).replace(',', ' ').replace('\n', ' ').replace('\r', ' ').strip()
         with open(labeled_csv_path, 'a') as f:
             f.write("{},{},{},{},{},{}\n".format(
                 tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label))
@@ -102,13 +103,36 @@ def label_data():
 def example_labeling():
     api_key = get_api_key()
     persian_tweet = "امروز با بچه‌ها میخوایم بریم بیرون و بعدش بریم سینما"
+    logger.info("Labeling example: {}".format(persian_tweet))
     label = get_tweet_label(api_key, persian_tweet)
-    print(label)
+    logger.info("Label: {}".format(label))
 
 
 @app.command()
-def clean_data():
-    pass
+def clean_data(path_to_labeled_csv: str):
+    logger.info("Cleaning data...")
+
+    # check labeled.csv exists
+    if not os.path.exists(path_to_labeled_csv):
+        raise FileNotFoundError("labeled.csv not found. Please provide a valid csv file or run label_data first.")
+
+    # open labeled.csv
+    with open(path_to_labeled_csv, 'r') as f:
+        lines = f.readlines()
+
+    date = os.path.basename(path_to_labeled_csv).split('_')[-1]
+    file_path = '../data/clean/cleaned_{}'.format(date)
+    with open(file_path, 'w') as f:
+        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+
+    for line in lines[1:]:
+        tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label = line.split(',')
+        tweet_text = clean_text(tweet_text)
+        with open(file_path, 'a') as f:
+            f.write("{},{},{},{},{},{}".format(
+                tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label))
+
+    logger.info("Cleaned data saved in {}".format(file_path))
 
 
 if __name__ == "__main__":

@@ -11,26 +11,28 @@ def remove_emoji(text):
     grin = 'خنده'
     laugh = 'خنده'
     happy = 'خوشحال'
-    text = re.sub(":D", grin, text)
-    text = re.sub(" (x|X)D", laugh, text)
-    text = re.sub(":\)+", happy, text)
+    _text = re.sub(":D", grin, text)
+    _text = re.sub(" (x|X)D", laugh, _text)
+    _text = re.sub(":\)+", happy, _text)
 
     # Sad
     sad = 'ناراحت'
     annoyed = 'رنجیده'
-    text = re.sub(":\(+", sad, text)
-    text = re.sub("-_+-", annoyed, text)
-    return text
+    _text = re.sub(":\(+", sad, _text)
+    _text = re.sub("-_+-", annoyed, _text)
+    return _text
 
 
 def remove_url(text):
-    text = re.sub("https?:\/\/t.co\/[A-Za-z0-9]*", '', text)
-    return text
+    _text = re.sub(r"https?:\S+", '', text)
+    return _text
 
 
 def remove_punc(text):
-    text = text.translate(str.maketrans('', '', string.punctuation))
-    return text
+    _text = text.translate(str.maketrans('', '', string.punctuation))
+    persian_virgol = '،'  # noqa
+    _text = _text.replace(persian_virgol, ' ')
+    return _text
 
 
 def remove_stopwords(text):
@@ -80,6 +82,9 @@ if __name__ == "__main__":
 
     nltk.download('stopwords')
     print(stopwords.words('english'))
+
+    print(remove_url('https://github.com/roshan-research/hazm hi there'))
+    print(remove_url('https hi there'))
 
     # download model from: https://github.com/roshan-research/hazm
     # tagger = POSTagger(model='resources/pos_tagger.model')
