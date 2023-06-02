@@ -137,7 +137,7 @@ def crawl_tweets_by_username(driver: webdriver.Chrome, username, limit=100, clic
     return tweets
 
 
-def save_tweets(tweets: dict, username, university, name):
+def create_unlabeled_table():
     conn = sqlite3.connect('../data/raw/unlabeled.db')
     cursor = conn.cursor()
     create_table_query = """ 
@@ -151,6 +151,13 @@ def save_tweets(tweets: dict, username, university, name):
     );
     """
     cursor.execute(create_table_query)
+    conn.commit()
+    cursor.close()
+
+
+def save_tweets(tweets: dict, username, university, name):
+    conn = sqlite3.connect('../data/raw/unlabeled.db')
+    cursor = conn.cursor()
     for tweet_time, tweet_text in tweets.items():
         tweet_text: str = tweet_text.strip().replace("'", '').replace('"', '')
         insert_query = "INSERT OR IGNORE INTO TWEETS (tweet_time, tweet_owner, tweet_text, owner_university, " + \

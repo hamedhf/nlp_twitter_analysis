@@ -13,6 +13,7 @@ selenium = "^4.9.1"
 openai = "^0.27.7"
 python-dotenv = "^1.0.0"
 typer = "^0.9.0"
+nltk = "^3.8.1"
 
 
 [build-system]
