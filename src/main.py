@@ -6,9 +6,9 @@ import typer
 from dotenv import load_dotenv
 from selenium import webdriver
 
-from utils.cleaning import clean_text
-from utils.crawling import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
-from utils.labeling import get_tweet_label, get_api_key, get_crawled_tweets
+from utils.clean import clean_text
+from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
+from utils.label import get_tweet_label, get_api_key, get_crawled_tweets
 
 app = typer.Typer()
 logger = None
@@ -121,18 +121,25 @@ def clean_data(path_to_labeled_csv: str):
         lines = f.readlines()
 
     date = os.path.basename(path_to_labeled_csv).split('_')[-1]
-    file_path = '../data/clean/cleaned_{}'.format(date)
-    with open(file_path, 'w') as f:
+    clean_file_path = '../data/clean/cleaned_{}'.format(date)
+    punc_file_path = '../data/clean/punc_{}'.format(date)
+    with open(clean_file_path, 'w') as f:
+        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+    with open(punc_file_path, 'w') as f:
         f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
 
     for line in lines[1:]:
         tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label = line.split(',')
-        tweet_text = clean_text(tweet_text)
-        with open(file_path, 'a') as f:
+        tweet_text, tweet_text_punc = clean_text(tweet_text)
+        with open(clean_file_path, 'a') as f:
             f.write("{},{},{},{},{},{}".format(
                 tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label))
+        with open(punc_file_path, 'a') as f:
+            f.write("{},{},{},{},{},{}".format(
+                tweet_time, tweet_owner, tweet_text_punc, owner_university, owner_name, label))
 
-    logger.info("Cleaned data saved in {}".format(file_path))
+    logger.info("Cleaned data saved in {}".format(clean_file_path))
+    logger.info("Cleaned data with punctuation saved in {}".format(punc_file_path))
 
 
 if __name__ == "__main__":
