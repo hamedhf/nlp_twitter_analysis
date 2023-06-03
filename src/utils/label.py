@@ -28,8 +28,8 @@ TOPICS = {
     21: 'home_and_garden',
     22: 'automotive',
     23: 'pets_and_animals',
-    24: 'other'
-    # weather_and_seasons
+    24: 'weather_and_seasons',
+    25: 'other'
 }
 
 

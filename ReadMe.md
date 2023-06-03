@@ -1,6 +1,7 @@
 # nlp_twitter_analysis
 
-This is an NLP (Natural Language Processing) project that focuses on gathering data from Twitter and labeling the topics of
+This is an NLP (Natural Language Processing) project that focuses on gathering data from Twitter and labeling the topics
+of
 the tweets using ChatGPT with supervision of a human annotator.
 
 ## Installation
@@ -20,7 +21,8 @@ touch users.csv
 ```
 
 ## How it works
-**Crawl -> Label -> Clean -> Analyze**
+
+**Crawl -> Label -> Clean/Punc -> Break by word/sentence -> Analyze**
 
 ## Usage
 
@@ -44,6 +46,10 @@ python main.py label-data
 python main.py clean-data
 ```
 
+## Hugging Face Dataset
+
+[Dataset Link](https://huggingface.co/datasets/hamedhf/nlp_twitter_analysis/tree/main)
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)

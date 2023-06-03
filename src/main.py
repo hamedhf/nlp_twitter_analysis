@@ -183,6 +183,19 @@ def break_by_sentence(path_to_punc_csv: str):
             f.write("{}\n".format(','.join(tweet)))
 
 
+@app.command()
+def generate_pdf_report():
+    latex_source_path = 'latex/report.tex'
+    pdf_path = '../Phase1-Report.pdf'
+    with open(latex_source_path, 'r') as latex_file:
+        latex_source = latex_file.read()
+
+    # replacing variables
+    date = datetime.now().strftime("%B %Y")
+    latex_source = latex_source.replace('var-date', date)
+    print(latex_source)
+
+
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(current_dir)

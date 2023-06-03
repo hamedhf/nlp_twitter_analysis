@@ -42,6 +42,21 @@ def remove_stopwords(text):
     pass
 
 
+def remove_numbers(text):
+    _text = re.sub(r'\d+', '', text)
+    return _text
+
+
+def remove_hashtags(text):
+    _text = re.sub(r'#\S+', '', text)
+    return _text
+
+
+def remove_mentions(text):
+    _text = re.sub(r'@\S+', '', text)
+    return _text
+
+
 def remove_duplicate_spaces(text):
     _text = " ".join(text.split())
     return _text
