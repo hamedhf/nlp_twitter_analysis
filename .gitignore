@@ -166,5 +166,6 @@ users.csv
 *.fdb_latexmk
 *.fls
 *.dvi
-report.pdf
-report.out
+src/latex/*.pdf
+src/latex/*.out
+tmp.tex

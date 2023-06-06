@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 from datetime import datetime
 
 import typer
@@ -243,15 +244,38 @@ def get_stats(file_timestamp: str):
 
 @app.command()
 def generate_pdf_report(file_timestamp: str):
+    root_dir = os.path.dirname(os.path.realpath(__file__))
+    root_dir = os.path.abspath(os.path.join(root_dir, os.pardir))
     latex_source_path = 'latex/report.tex'
-    pdf_path = '../Phase1-Report.pdf'
+
     with open(latex_source_path, 'r') as latex_file:
         latex_source = latex_file.read()
 
     # replacing variables \def\timestamp{2023-06-02-10-27-57}
     latex_source = latex_source.replace(
-        r'\def\timestamp{2023-06-02-10-27-57}', r'\def\timestamp{' + file_timestamp + '}')
-    os.system(f'pdflatex -output-directory={pdf_path}')
+        r'\def\timestamp{2023-06-02-10-27-57}',
+        r'\def\timestamp{' + file_timestamp + '}'
+    )
+    latex_source = latex_source.replace(
+        r'\def\rootDir{../..}',
+        r'\def\rootDir{' + root_dir + '}'
+    )
+
+    tmp_file_path = 'latex/tmp.tex'
+    with open(tmp_file_path, 'w') as tmp_file:
+        tmp_file.write(latex_source)
+
+    command = 'pdflatex -output-directory=./latex -jobname=Phase1-Report ./latex/tmp.tex'
+    os.system(command)
+
+    pdf_save_path = root_dir + '/Phase1-Report.pdf'
+    os.rename(f'{root_dir}/src/latex/Phase1-Report.pdf', pdf_save_path)
+    logger.info("PDF report generated at {}".format(pdf_save_path))
+
+    pattern = r'^Phase1-Report.*' + '|' + r'^tmp.*' + '|' + r'^report.*'
+    for f in os.listdir('./latex'):
+        if re.search(pattern, f) and f != 'report.tex':
+            os.remove(os.path.join('./latex', f))
 
 
 if __name__ == "__main__":
