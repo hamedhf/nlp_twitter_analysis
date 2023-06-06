@@ -58,6 +58,10 @@ python main.py break-by-sentence path-to-punc-csv
 python main.py get-stats file-timestamp
 ```
 
+```bash
+python main.py generate-pdf-report file-timestamp
+```
+
 ## Hugging Face Dataset
 
 [Dataset Link](https://huggingface.co/datasets/hamedhf/nlp_twitter_analysis/tree/main)

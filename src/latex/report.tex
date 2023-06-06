@@ -7,6 +7,7 @@
 
 \def\timestamp{2023-06-02-10-27-57}
 \def\csvStats{../../stats/stats_\timestamp.csv}
+\def\pngStats{../../stats/plot_\timestamp.png}
 
 \hypersetup{
     colorlinks=true,
@@ -45,25 +46,12 @@ We have splitted data with three criteria: split by sentence with hazm sentence 
 For cleaning the data, we used the following steps: remove emojis, remove urls, remove hashtags, remove mentions, remove numbers, remove punctuations. We used the hazm, cleantext and nltk libraries for this purpose.
 
 \section{Labeling}
-We give label to the whole tweet using ChatGPT. For more info about labeling see the src\slash utils\slash label.py file.
+We give label to the whole tweet using ChatGPT. For more info about labeling see the src\slash utils\slash label.py file. You can also see the labels in src\slash utils\slash constants.py file.
 
 \section{Statistics}
 \csvautotabular{\csvStats}
-
 \begin{center}
-\begin{tikzpicture}
-\begin{axis}[
-    axis lines=left, 
-    xlabel=labels, 
-    ylabel=Number of unique words,
-    x tick label style={
-		/pgf/number format/1000 sep=}
-]
-\addplot 
-	coordinates {(2012,408184) (2011,408348)
-		 (2010,414870) (2009,412156)};
-\end{axis}
-\end{tikzpicture}
+    \includegraphics[width=1\textwidth]{\pngStats}
 \end{center}
 
 \end{document}

@@ -26,3 +26,6 @@ TOPICS = {
     24: 'weather_and_seasons',
     25: 'other'
 }
+
+PAD_TOKEN_OLD = 'PAD'
+PAD_TOKEN = '<PAD>'

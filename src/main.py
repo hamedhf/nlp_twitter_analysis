@@ -10,7 +10,14 @@ from utils.clean import clean_text
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_api_key, get_crawled_tweets
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
-from utils.stats import get_tweet_count, get_segment_count, get_unique_word_count, write_dict_to_csv
+from utils.stats import (
+    get_tweet_count,
+    get_segment_count,
+    get_unique_word_count,
+    write_dict_to_csv,
+    top_ten_frequent_word_per_label,
+    get_plot
+)
 
 app = typer.Typer()
 logger = None
@@ -230,18 +237,21 @@ def get_stats(file_timestamp: str):
     }
     write_dict_to_csv(dictionary, '../stats/stats_{}.csv'.format(file_timestamp))
 
+    top_ten_frequent = top_ten_frequent_word_per_label(path_to_word_csv, path_to_clean_csv)
+    get_plot(file_timestamp, top_ten_frequent)
+
 
 @app.command()
-def generate_pdf_report():
+def generate_pdf_report(file_timestamp: str):
     latex_source_path = 'latex/report.tex'
     pdf_path = '../Phase1-Report.pdf'
     with open(latex_source_path, 'r') as latex_file:
         latex_source = latex_file.read()
 
-    # replacing variables
-    date = datetime.now().strftime("%B %Y")
-    latex_source = latex_source.replace('var-date', date)
-    print(latex_source)
+    # replacing variables \def\timestamp{2023-06-02-10-27-57}
+    latex_source = latex_source.replace(
+        r'\def\timestamp{2023-06-02-10-27-57}', r'\def\timestamp{' + file_timestamp + '}')
+    os.system(f'pdflatex -output-directory={pdf_path}')
 
 
 if __name__ == "__main__":
