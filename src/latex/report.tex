@@ -1,18 +1,35 @@
 \documentclass[12pt, letterpaper]{article}
+\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{pgfplots}
+\usepackage{csvsimple}
+
+\def\timestamp{2023-06-02-10-27-57}
+\def\csvStats{../../stats/stats_\timestamp.csv}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
 \pgfplotsset{width=10cm}
 
 \title{NLP Twitter Analysis}
 \author{Hamed Feizabadi}
-\date{var-date}
+\date{\today}
 
 \begin{document}
 \maketitle
 
 \section{Introduction}
 Our source for this project is Twitter. You should create a file named "users.csv" inside src folder which contains the Twitter username, University name an Actual name of the users you wish to analyze.
+
+\section{Repository}
+You can access the source code of this project at \url{https://github.com/hamedhf/nlp_twitter_analysis}
 
 \section{Data Collection}
 We used selenium $>=$ 4.6.0 for collecting data from Twitter. This tool helps us to bring up an actual browser and navigate through the pages. Note that you should have Chrome installed on your system for this to work. Then you can simply install other dependencies form pyproject.toml file using poetry or other package managers.
@@ -31,15 +48,7 @@ For cleaning the data, we used the following steps: remove emojis, remove urls, 
 We give label to the whole tweet using ChatGPT. For more info about labeling see the src\slash utils\slash label.py file.
 
 \section{Statistics}
-\begin{center}
-\begin{tabular}{ |c|c|c|c| } 
-    \hline
-    tweet count & sentence count & word count & unique word count \\ 
-    \hline
-    var-tweet-count & var-sentence-count & var-word-count & var-unique-word-count \\
-    \hline
-\end{tabular}
-\end{center}
+\csvautotabular{\csvStats}
 
 \begin{center}
 \begin{tikzpicture}

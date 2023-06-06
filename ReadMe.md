@@ -43,7 +43,19 @@ python main.py label-data
 ```
 
 ```bash
-python main.py clean-data
+python main.py clean-data path-to-labeled-csv
+```
+
+```bash
+python main.py break-by-word path-to-cleaned-csv
+```
+
+```bash
+python main.py break-by-sentence path-to-punc-csv
+```
+
+```bash
+python main.py get-stats file-timestamp
 ```
 
 ## Hugging Face Dataset

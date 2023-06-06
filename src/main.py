@@ -10,6 +10,7 @@ from utils.clean import clean_text
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_api_key, get_crawled_tweets
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
+from utils.stats import get_tweet_count, get_segment_count, get_unique_word_count, write_dict_to_csv
 
 app = typer.Typer()
 logger = None
@@ -181,6 +182,53 @@ def break_by_sentence(path_to_punc_csv: str):
     with open(sentence_file_path, 'w') as f:
         for tweet in tweets:
             f.write("{}\n".format(','.join(tweet)))
+
+
+@app.command()
+def get_stats(file_timestamp: str):
+    path_to_clean_csv = '../data/clean/cleaned_{}.csv'.format(file_timestamp)
+    path_to_punc_csv = '../data/clean/punc_{}.csv'.format(file_timestamp)
+    path_to_word_csv = '../data/wordbroken/wordbroken_{}.csv'.format(file_timestamp)
+    path_to_sentence_csv = '../data/sentencebroken/sentencebroken_{}.csv'.format(file_timestamp)
+
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError(
+            f"{path_to_clean_csv} not found. Please provide a valid csv file or run clean_data first.")
+
+    # check punc.csv exists
+    if not os.path.exists(path_to_punc_csv):
+        raise FileNotFoundError(
+            f"{path_to_punc_csv} not found. Please provide a valid csv file or run clean_data first.")
+
+    # check wordbroken.csv exists
+    if not os.path.exists(path_to_word_csv):
+        raise FileNotFoundError(
+            f"{path_to_word_csv} not found. Please provide a valid csv file or run break_by_word first.")
+
+    # check sentencebroken.csv exists
+    if not os.path.exists(path_to_sentence_csv):
+        raise FileNotFoundError(
+            f"{path_to_sentence_csv} not found. Please provide a valid csv file or run break_by_sentence first.")
+
+    # get stats
+    tweet_count = get_tweet_count(path_to_clean_csv)
+    word_count = get_segment_count(path_to_word_csv)
+    sentence_count = get_segment_count(path_to_sentence_csv)
+    unique_word_count = get_unique_word_count(path_to_word_csv)
+
+    logger.info("Tweet count: {}".format(tweet_count))
+    logger.info("Word count: {}".format(word_count))
+    logger.info("Sentence count: {}".format(sentence_count))
+    logger.info("Unique word count: {}".format(unique_word_count))
+
+    dictionary = {
+        'tweet-count': tweet_count,
+        'word-count': word_count,
+        'sentence-count': sentence_count,
+        'unique-word-count': unique_word_count
+    }
+    write_dict_to_csv(dictionary, '../stats/stats_{}.csv'.format(file_timestamp))
 
 
 @app.command()

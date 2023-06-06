@@ -167,3 +167,4 @@ users.csv
 *.fls
 *.dvi
 report.pdf
+report.out
