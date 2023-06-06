@@ -2,11 +2,12 @@ import re
 import string
 
 import nltk
+from cleantext.clean import remove_emoji as clean_text_remove_emoji
 from hazm import Normalizer, stopwords_list
 from nltk.corpus import stopwords
 
 
-def remove_emoji(text):
+def replace_emojis(text):
     # Happy
     grin = 'خنده'
     laugh = 'خنده'
@@ -20,6 +21,11 @@ def remove_emoji(text):
     annoyed = 'رنجیده'
     _text = re.sub(":\(+", sad, _text)
     _text = re.sub("-_+-", annoyed, _text)
+    return _text
+
+
+def remove_emojis(text):
+    _text = clean_text_remove_emoji(text)
     return _text
 
 
@@ -63,9 +69,15 @@ def remove_duplicate_spaces(text):
 
 
 def clean_text(text) -> tuple[str, str]:
-    _punc_text = remove_duplicate_spaces(
-        remove_url(
-            remove_emoji(text)
+    _punc_text = remove_numbers(
+        remove_mentions(
+            remove_hashtags(
+                remove_duplicate_spaces(
+                    remove_url(
+                        remove_emojis(text)
+                    )
+                )
+            )
         )
     )
 

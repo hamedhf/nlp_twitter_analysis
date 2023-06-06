@@ -25,7 +25,7 @@ We use tweet\_time, tweet\_owner as unique identifiers for each tweet. The tweet
 \section{Data Preprocessing}
 We have splitted data with three criteria: split by sentence with hazm sentence tokenizer, split by word with hazm word tokenizer, split by word with hazm lemmatizer.
 
-For cleaning the data, we used the following steps: replace emojis, remove urls, remove hashtags, remove mentions, remove numbers, remove punctuations. We used the hazm and nltk libraries for this purpose.
+For cleaning the data, we used the following steps: remove emojis, remove urls, remove hashtags, remove mentions, remove numbers, remove punctuations. We used the hazm, cleantext and nltk libraries for this purpose.
 
 \section{Labeling}
 We give label to the whole tweet using ChatGPT. For more info about labeling see the src\slash utils\slash label.py file.
