@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from bidi import algorithm as bidialg
 from hazm import lemmatizer
 
-from .constants import TOPICS
+from .constants import TOPICS, PAD_TOKEN
 from .label import get_clean_label
 
 
@@ -23,7 +23,7 @@ def get_segment_count(path_to_segment_csv: str):
         line = line[:-1]
         segments = line.split(',')
         for segment in segments:
-            if segment != 'PAD':
+            if segment != PAD_TOKEN:
                 count += 1
 
     return count
@@ -39,7 +39,7 @@ def get_unique_word_count(path_to_word_csv: str):
         line = line[:-1]
         segments = line.split(',')
         for segment in segments:
-            if segment != 'PAD':
+            if segment != PAD_TOKEN:
                 words.add(lm.lemmatize(segment))
 
     return len(words)
@@ -65,7 +65,7 @@ def top_ten_frequent_word_per_label(path_to_word_csv: str, path_to_clean_csv: st
         segments = line.split(',')
         label = get_clean_label(clean_line.split(',')[-1])
         for segment in segments:
-            if segment != 'PAD':
+            if segment != PAD_TOKEN:
                 word = lm.lemmatize(segment)
                 if word in dictionary[label]:
                     dictionary[label][word] += 1
@@ -93,7 +93,7 @@ def tf_idf_per_word(path_to_word_csv: str, path_to_clean_csv: str) -> dict:
         segments = line.split(',')
         label = get_clean_label(clean_line.split(',')[-1])
         for segment in segments:
-            if segment != 'PAD':
+            if segment != PAD_TOKEN:
                 word = lm.lemmatize(segment)
                 if word in dictionary:
                     if label in dictionary[word]:
