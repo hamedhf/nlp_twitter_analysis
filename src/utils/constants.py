@@ -1,3 +1,5 @@
+import os
+
 TOPICS = {
     0: 'politics_and_current_affairs',
     1: 'entertainment_and_pop_culture',
@@ -26,6 +28,21 @@ TOPICS = {
     24: 'weather_and_seasons',
     25: 'other'
 }
-
 PAD_TOKEN_OLD = 'PAD'
 PAD_TOKEN = '<PAD>'
+
+
+def get_api_base_url():
+    api_base_url = os.getenv("OPENAI_API_BASE_URL")
+    if api_base_url is None:
+        raise ValueError("OPENAI_API_BASE_URL not found in .env file.")
+    else:
+        return api_base_url
+
+
+def get_api_key():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key is None:
+        raise ValueError("OPENAI_API_KEY not found in .env file.")
+    else:
+        return api_key

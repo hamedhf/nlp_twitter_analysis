@@ -7,9 +7,10 @@ import typer
 from dotenv import load_dotenv
 from selenium import webdriver
 
-from utils.clean import clean_text
+from utils.clean import clean_text, get_clean_label, translate_english_to_persian
+from utils.constants import get_api_key, get_api_base_url
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
-from utils.label import get_tweet_label, get_api_key, get_crawled_tweets
+from utils.label import get_tweet_label, get_crawled_tweets
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
 from utils.stats import (
     get_tweet_count,
@@ -81,6 +82,7 @@ def scrape_twitter():
 @app.command()
 def label_data():
     api_key = get_api_key()
+    api_base_url = get_api_base_url()
 
     # check unlabeled.db exists
     if not os.path.exists('../data/raw/unlabeled.db'):
@@ -103,7 +105,8 @@ def label_data():
         tweet_text: str = tweet[2].replace('\n', ' ').replace('\r', ' ').replace(',', ' ').strip()
         owner_university = tweet[3].strip()
         owner_name = tweet[4].strip()
-        label = get_tweet_label(api_key, tweet_text).replace(',', ' ').replace('\n', ' ').replace('\r', ' ').strip()
+        label = get_tweet_label(
+            api_key, api_base_url, tweet_text).replace(',', ' ').replace('\n', ' ').replace('\r', ' ').strip()
         with open(labeled_csv_path, 'a') as f:
             f.write("{},{},{},{},{},{}\n".format(
                 tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label))
@@ -112,14 +115,15 @@ def label_data():
 @app.command()
 def example_labeling():
     api_key = get_api_key()
-    persian_tweet = "امروز با بچه‌ها میخوایم بریم بیرون و بعدش بریم سینما"
+    api_base_url = get_api_base_url()
+    persian_tweet = "امروز با بچه‌ها میخوایم بریم بیرون و بعدش بریم سینما"  # noqa
     logger.info("Labeling example: {}".format(persian_tweet))
-    label = get_tweet_label(api_key, persian_tweet)
+    label = get_tweet_label(api_key, api_base_url, persian_tweet)
     logger.info("Label: {}".format(label))
 
 
 @app.command()
-def clean_data(path_to_labeled_csv: str):
+def clean_data(path_to_labeled_csv: str, skip: bool = False, skip_count: int = 1):
     logger.info("Cleaning data...")
 
     # check labeled.csv exists
@@ -133,19 +137,30 @@ def clean_data(path_to_labeled_csv: str):
     date = os.path.basename(path_to_labeled_csv).split('_')[-1]
     clean_file_path = '../data/clean/cleaned_{}'.format(date)
     punc_file_path = '../data/clean/punc_{}'.format(date)
-    with open(clean_file_path, 'w') as f:
-        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
-    with open(punc_file_path, 'w') as f:
-        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+    api_key = get_api_key()
+    api_base_url = get_api_base_url()
 
-    for line in lines[1:]:
+    if not skip:
+        with open(clean_file_path, 'w') as f:
+            f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+        with open(punc_file_path, 'w') as f:
+            f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+
+    for line in lines[skip_count:]:
         tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label = line.split(',')
+
+        if tweet_text == '':
+            continue
+
+        tweet_text = translate_english_to_persian(api_key, api_base_url, tweet_text)
         tweet_text, tweet_text_punc = clean_text(tweet_text)
+        label = get_clean_label(label)
+
         with open(clean_file_path, 'a') as f:
-            f.write("{},{},{},{},{},{}".format(
+            f.write("{},{},{},{},{},{}\n".format(
                 tweet_time, tweet_owner, tweet_text, owner_university, owner_name, label))
         with open(punc_file_path, 'a') as f:
-            f.write("{},{},{},{},{},{}".format(
+            f.write("{},{},{},{},{},{}\n".format(
                 tweet_time, tweet_owner, tweet_text_punc, owner_university, owner_name, label))
 
     logger.info("Cleaned data saved in {}".format(clean_file_path))
@@ -265,7 +280,7 @@ def generate_pdf_report(file_timestamp: str):
     with open(tmp_file_path, 'w') as tmp_file:
         tmp_file.write(latex_source)
 
-    command = 'pdflatex -output-directory=./latex -jobname=Phase1-Report ./latex/tmp.tex'
+    command = 'pdflatex -output-directory=./latex -jobname=Phase1-Report ./latex/tmp.tex'  # noqa
     os.system(command)
 
     pdf_save_path = root_dir + '/Phase1-Report.pdf'

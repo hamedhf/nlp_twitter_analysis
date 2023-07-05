@@ -1,17 +1,8 @@
-import os
 import sqlite3
 
 import openai
 
 from .constants import TOPICS
-
-
-def get_api_key():
-    api_key = os.getenv("OPENAI_API_KEY")
-    if api_key is None:
-        raise ValueError("OPENAI_API_KEY not found in .env file.")
-    else:
-        return api_key
 
 
 def get_clean_label(input_label: str) -> str:
@@ -20,13 +11,13 @@ def get_clean_label(input_label: str) -> str:
             label = value
             break
     else:
-        label = 'unknown'
+        label = 'other'
     return label
 
 
-def get_tweet_label(api_key: str, tweet: str) -> str:
+def get_tweet_label(api_key: str, api_base: str, tweet: str) -> str:
     openai.api_key = api_key
-    openai.api_base = 'https://api.pawan.krd/v1'
+    openai.api_base = api_base
     topics = list(TOPICS.values())
     messages = [
         {
