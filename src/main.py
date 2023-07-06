@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 import re
 from datetime import datetime
 
@@ -7,6 +8,7 @@ import typer
 from dotenv import load_dotenv
 from selenium import webdriver
 
+from utils.augment import get_tweet_count_per_label, augment_label, append_augmented_data
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
 from utils.constants import get_api_key, get_api_base_url
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
@@ -46,6 +48,9 @@ def check_necessary_files():
     if not os.path.exists('../data/clean'):
         os.mkdir('../data/clean')
 
+    if not os.path.exists('../data/augment'):
+        os.mkdir('../data/augment')
+
     if not os.path.exists('../data/wordbroken'):
         os.mkdir('../data/wordbroken')
 
@@ -54,6 +59,12 @@ def check_necessary_files():
 
     if not os.path.exists('../stats'):
         os.mkdir('../stats')
+
+    if not os.path.exists('../models'):
+        os.mkdir('../models')
+
+    if not os.path.exists('../logs'):
+        os.mkdir('../logs')
 
     if not os.path.exists('./users.csv'):
         raise FileNotFoundError("users.csv not found. Please create it.")
@@ -291,6 +302,43 @@ def generate_pdf_report(file_timestamp: str):
     for f in os.listdir('./latex'):
         if re.search(pattern, f) and f != 'report.tex':
             os.remove(os.path.join('./latex', f))
+
+
+@app.command()
+def augment_data(path_to_clean_csv: str, min_tweet_count_per_label: int = 200):
+    logger.info("Augmenting data...")
+
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError("clean.csv not found. Please provide a valid csv file or run clean_data first.")
+
+    with open(path_to_clean_csv, 'r') as f:
+        lines = f.readlines()[1:]  # skip header
+
+    date = os.path.basename(path_to_clean_csv).split('_')[-1]
+    augmented_file_path = '../data/augment/augmented_{}'.format(date)
+    with open(augmented_file_path, 'w') as f:
+        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+    append_augmented_data(augmented_file_path, lines)
+
+    counts = get_tweet_count_per_label(path_to_clean_csv)
+    print(f"cleaned data counts: {counts}")
+
+    for label, count in counts.items():
+        if count < min_tweet_count_per_label:
+            logger.info("Augmenting label: {}".format(label))
+            _ = augment_label(label, min_tweet_count_per_label - count, augmented_file_path, temperature=0.6)
+
+    # shuffle lines
+    with open(augmented_file_path, 'r') as f:
+        lines = f.readlines()[1:]
+        random.shuffle(lines)
+    with open(augmented_file_path, 'w') as f:
+        f.write("tweet_time,tweet_owner,tweet_text,owner_university,owner_name,label\n")
+    append_augmented_data(augmented_file_path, lines)
+
+    counts = get_tweet_count_per_label(augmented_file_path)
+    print(f"augmented data counts: {counts}")
 
 
 if __name__ == "__main__":
