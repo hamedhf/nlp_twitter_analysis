@@ -22,7 +22,7 @@ touch users.csv
 
 ## How it works
 
-**Crawl -> Label -> Clean/Punc -> Break by word/sentence -> Analyze**
+**Phase 1: Crawl -> Label -> Clean/Punc -> Break by word/sentence -> Analyze**
 
 ## Usage
 
@@ -71,6 +71,20 @@ python src/main.py augment-data path-to-cleaned-csv
 
 example: python src/main.py augment-data ../data/clean/cleaned_2023-06-02-10-27-57.csv
 example: python src/main.py augment-data ../data/clean/cleaned_2023-06-02-10-27-57.csv --min-tweet-count-per-label 100
+```
+
+#### Word2Vec
+```bash
+python src/main.py train-word2vec-label path-to-augmented-csv label
+example: python src/main.py train-word2vec-label ../data/augment/augmented_2023-06-02-10-27-57.csv home_and_garden
+```
+```bash
+python src/main.py train-word2vec-preselected path-to-augmented-csv
+example: python src/main.py train-word2vec-preselected ../data/augment/augmented_2023-06-02-10-27-57.csv
+```
+```bash
+python src/main.py train-word2vec-all path-to-augmented-csv
+example: python src/main.py train-word2vec-all ../data/augment/augmented_2023-06-02-10-27-57.csv
 ```
 
 ## Hugging Face Dataset

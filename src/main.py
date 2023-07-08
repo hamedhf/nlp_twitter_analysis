@@ -10,7 +10,7 @@ from selenium import webdriver
 
 from utils.augment import get_tweet_count_per_label, augment_label, append_augmented_data
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
-from utils.constants import get_api_key, get_api_base_url
+from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_crawled_tweets
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
@@ -22,8 +22,11 @@ from utils.stats import (
     top_ten_frequent_word_per_label,
     get_plot
 )
+from utils.word2vec import train_for_label, train_for_all
 
 app = typer.Typer()
+current_dir = None
+parr_dir = None
 logger = None
 DEBUG = None
 
@@ -62,6 +65,9 @@ def check_necessary_files():
 
     if not os.path.exists('../models'):
         os.mkdir('../models')
+
+    if not os.path.exists('../models/word2vec'):
+        os.mkdir('../models/word2vec')
 
     if not os.path.exists('../logs'):
         os.mkdir('../logs')
@@ -341,8 +347,51 @@ def augment_data(path_to_clean_csv: str, min_tweet_count_per_label: int = 200):
     print(f"augmented data counts: {counts}")
 
 
+@app.command()
+def train_word2vec_label(path_to_clean_csv: str, label: str):
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError("clean.csv not found. Please provide a valid csv file or run clean_data first.")
+    if label not in TOPICS.values():
+        raise ValueError(f"Invalid label. Please provide a valid label. Valid labels are: {TOPICS.values()}")
+    logger.info(f"Training word2vec model for label: {label}")
+    model = train_for_label(path_to_clean_csv, label)
+    model.save(f'../models/word2vec/{label}.npy')
+    logger.info(f"Model saved at {parr_dir}/models/word2vec/{label}.npy")
+
+
+@app.command()
+def train_word2vec_preselected(path_to_clean_csv: str):
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError("clean.csv not found. Please provide a valid csv file or run clean_data first.")
+    preselected_labels = ["politics_and_current_affairs", "education_and_learning", "environment_and_sustainability",
+                          "home_and_garden", "weather_and_seasons"]
+    for label in preselected_labels:
+        if label not in TOPICS.values():
+            raise ValueError(
+                f"Invalid preselected labels. Please provide a valid label. Valid labels are: {TOPICS.values()}")
+    for label in preselected_labels:
+        logger.info(f"Training word2vec model for label: {label}")
+        model = train_for_label(path_to_clean_csv, label)
+        model.save(f'../models/word2vec/{label}.npy')
+        logger.info(f"Model saved at {parr_dir}/models/word2vec/{label}.npy")
+
+
+@app.command()
+def train_word2vec_all(path_to_clean_csv: str):
+    # check clean.csv exists
+    if not os.path.exists(path_to_clean_csv):
+        raise FileNotFoundError("clean.csv not found. Please provide a valid csv file or run clean_data first.")
+    logger.info(f"Training word2vec model for all labels")
+    model = train_for_all(path_to_clean_csv)
+    model.save(f'../models/word2vec/all.npy')
+    logger.info(f"Model saved at {parr_dir}/models/word2vec/all.npy")
+
+
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
+    parr_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
     os.chdir(current_dir)
     check_necessary_files()
     load_dotenv('./.env')
