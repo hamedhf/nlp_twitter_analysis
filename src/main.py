@@ -9,10 +9,12 @@ from dotenv import load_dotenv
 from selenium import webdriver
 
 from utils.augment import get_tweet_count_per_label, augment_label, append_augmented_data
+from utils.basic import check_necessary_files
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
 from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_crawled_tweets
+from utils.parsbert import prepare_dataset
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
 from utils.stats import (
     get_tweet_count,
@@ -27,6 +29,7 @@ from utils.word2vec import train_for_label, train_for_all
 app = typer.Typer()
 current_dir = None
 parr_dir = None
+huggingface_cache_dir = None
 logger = None
 DEBUG = None
 
@@ -39,44 +42,6 @@ def create_logger():
     new_logger.addHandler(handler)
     new_logger.setLevel(level=logging.DEBUG if DEBUG else logging.WARNING)
     return new_logger
-
-
-def check_necessary_files():
-    if not os.path.exists('../data'):
-        os.mkdir('../data')
-
-    if not os.path.exists('../data/raw'):
-        os.mkdir('../data/raw')
-
-    if not os.path.exists('../data/clean'):
-        os.mkdir('../data/clean')
-
-    if not os.path.exists('../data/augment'):
-        os.mkdir('../data/augment')
-
-    if not os.path.exists('../data/wordbroken'):
-        os.mkdir('../data/wordbroken')
-
-    if not os.path.exists('../data/sentencebroken'):
-        os.mkdir('../data/sentencebroken')
-
-    if not os.path.exists('../stats'):
-        os.mkdir('../stats')
-
-    if not os.path.exists('../models'):
-        os.mkdir('../models')
-
-    if not os.path.exists('../models/word2vec'):
-        os.mkdir('../models/word2vec')
-
-    if not os.path.exists('../logs'):
-        os.mkdir('../logs')
-
-    if not os.path.exists('./users.csv'):
-        raise FileNotFoundError("users.csv not found. Please create it.")
-
-    if not os.path.exists('./.env'):
-        raise FileNotFoundError(".env not found. Please create it like .env.example.")
 
 
 @app.command()
@@ -389,9 +354,16 @@ def train_word2vec_all(path_to_clean_csv: str):
     logger.info(f"Model saved at {parr_dir}/models/word2vec/all.npy")
 
 
+@app.command()
+def fine_tune_parsbert(path_to_augmented_csv: str):
+    logger.info("Fine tuning parsbert...")
+    prepare_dataset(path_to_augmented_csv)
+
+
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
     parr_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+    huggingface_cache_dir = parr_dir + '/models/huggingface_cache'
     os.chdir(current_dir)
     check_necessary_files()
     load_dotenv('./.env')

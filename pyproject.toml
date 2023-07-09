@@ -23,6 +23,7 @@ torch = "^2.0.1"
 torchvision = "^0.15.2"
 torchaudio = "^2.0.2"
 transformers = "^4.30.2"
+huggingface-hub = {extras = ["cli"], version = "^0.16.4"}
 
 
 [build-system]
