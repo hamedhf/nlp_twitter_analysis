@@ -3,17 +3,23 @@
 This is an NLP (Natural Language Processing) project that focuses on gathering data from Twitter and labeling the topics
 of
 the tweets using ChatGPT with supervision of a human annotator.
+## Requirements
+Conda and Poetry are required to run this project.
 
 ## Installation
-
+```bash
+conda create -n nlp-project python=3.11
+```
+```bash
+conda activate nlp-project
+```
+```bash
+# (Required for PyTorch to work)
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+```
  ```bash
 poetry install
- ``` 
-
-```bash
-poetry shell
-```
-
+ ```
 ```bash
 cd src
 copy .env.sample .env
@@ -66,6 +72,7 @@ example: python src/main.py generate-pdf-report 2023-06-02-10-27-57
 ```
 
 ### Phase 2
+### Augmenting Data
 ```bash
 python src/main.py augment-data path-to-cleaned-csv
 
