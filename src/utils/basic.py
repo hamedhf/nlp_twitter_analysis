@@ -20,6 +20,9 @@ def check_necessary_files():
     if not os.path.exists('../data/sentencebroken'):
         os.mkdir('../data/sentencebroken')
 
+    if not os.path.exists('../data/languagemodel'):
+        os.mkdir('../data/languagemodel')
+
     if not os.path.exists('../data/split'):
         os.mkdir('../data/split')
 

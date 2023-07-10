@@ -170,4 +170,6 @@ src/latex/*.pdf
 src/latex/*.out
 tmp.tex
 models/huggingface_cache
-models/parsbert/final
+models/parsbert/best/pytorch_model.bin
+models/parsbert/final/pytorch_model.bin
+logs/
