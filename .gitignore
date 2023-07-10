@@ -170,3 +170,4 @@ src/latex/*.pdf
 src/latex/*.out
 tmp.tex
 models/huggingface_cache
+models/parsbert/final

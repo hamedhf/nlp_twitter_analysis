@@ -24,6 +24,8 @@ torchvision = "^0.15.2"
 torchaudio = "^2.0.2"
 transformers = "^4.30.2"
 huggingface-hub = {extras = ["cli"], version = "^0.16.4"}
+pandas = "^2.0.3"
+tqdm = "^4.65.0"
 
 
 [build-system]

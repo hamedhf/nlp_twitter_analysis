@@ -4,6 +4,7 @@ import random
 import re
 from datetime import datetime
 
+import torch
 import typer
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -14,8 +15,9 @@ from utils.clean import clean_text, get_clean_label, translate_english_to_persia
 from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.label import get_tweet_label, get_crawled_tweets
-from utils.parsbert import prepare_dataset
+from utils.parsbert import train_parsbert
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
+from utils.split import prepare_dataset
 from utils.stats import (
     get_tweet_count,
     get_segment_count,
@@ -357,7 +359,16 @@ def train_word2vec_all(path_to_clean_csv: str):
 @app.command()
 def fine_tune_parsbert(path_to_augmented_csv: str):
     logger.info("Fine tuning parsbert...")
-    prepare_dataset(path_to_augmented_csv)
+    if not os.path.exists(path_to_augmented_csv):
+        raise FileNotFoundError("augmented.csv not found. Please provide a valid csv file or run augment_data first.")
+    csv_files = os.listdir("../data/split")
+    if 'test.csv' not in csv_files or 'train.csv' not in csv_files or 'validation.csv' not in csv_files:
+        prepare_dataset(path_to_augmented_csv)
+    else:
+        logger.info("Dataset already prepared. Skipping preparation step.")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+    train_parsbert(device)
 
 
 if __name__ == "__main__":

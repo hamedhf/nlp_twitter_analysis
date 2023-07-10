@@ -20,8 +20,8 @@ def check_necessary_files():
     if not os.path.exists('../data/sentencebroken'):
         os.mkdir('../data/sentencebroken')
 
-    if not os.path.exists('../data/parsbert'):
-        os.mkdir('../data/parsbert')
+    if not os.path.exists('../data/split'):
+        os.mkdir('../data/split')
 
     if not os.path.exists('../stats'):
         os.mkdir('../stats')
@@ -31,6 +31,9 @@ def check_necessary_files():
 
     if not os.path.exists('../models/word2vec'):
         os.mkdir('../models/word2vec')
+
+    if not os.path.exists('../models/parsbert'):
+        os.mkdir('../models/parsbert')
 
     if not os.path.exists('../models/huggingface_cache'):
         os.mkdir('../models/huggingface_cache')
