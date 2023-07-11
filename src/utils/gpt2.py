@@ -319,6 +319,10 @@ def train_gpt2(label: str, device: torch.device):
     plt.legend()
     plt.xticks([1, 2, 3, 4])
     plt.savefig(path_to_plot)
+    # clear plt and sns memory
+    sns.reset_orig()
+    plt.close("all")
+    plt.clf()
 
     # Saving the model and the tokenizer
     path_to_model = f'../models/gpt2/{label}/'
