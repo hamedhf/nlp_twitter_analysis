@@ -260,7 +260,7 @@
     \section{Language Model}\label{sec:language-model}
     We used huggingface transformers library for training the language model. The implementation is in src\slash utils\slash gpt2.py file. We used HooshvareLab/gpt2-fa model for this purpose. The model is trained on huge Persian corpus and it is available at \url{https://huggingface.co/HooshvareLab/gpt2-fa}. Use of pretained model helps us gain better results with less data.
     
-    \subsection{Fine Tuning}\label{subsec:fine-tuning}
+    \subsection{Fine Tuning}\label{subsec:fine-tuning-gpt2}
     The below command shows how to fine tune the model for a specific label. The script will check for dataset in data\slash languagemodel and if it is not available, it will create it using the augmented data. Then it will fine tune the model for the given label and save the model in models\slash gpt2\slash label folder.
     \begin{center}
         \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/train-gpt2.png}
@@ -299,6 +299,45 @@
         \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/gpt2_generation.png}
     \end{center}
     It is important to note that we should set max\_seq length according to the common length of the tweets in the dataset. If we set it a large number, then model will be overfitted on PAD token and it will generate a lot of PAD tokens.
+
+    \section{Classification}\label{sec:classification}
+    We have utilized the HooshvareLab/bert-base-parsbert-uncased model, a variant of BERT specifically designed for Persian language processing, to extract features from the tweets for our text classification task. 
+    The tweets were tokenized using the ParseBERT tokenizer, which splits the text into individual tokens, including special tokens like [CLS] denoting the classification task. 
+    The ParseBERT model, consisting of multiple transformer layers, was then employed to process the tokenized input and learn contextual dependencies among the tokens. By leveraging the pre-trained contextualized representations of the HooshvareLab/bert-base-parsbert-uncased model, we could effectively capture the semantic and syntactic information within the Persian tweets. Finally, the contextualized representation of the [CLS] token was passed through a classification head, enabling the model to map the features to the appropriate number of output labels. This approach empowered us to perform accurate and efficient text classification on Persian tweets.
+    \begin{figure}[H]
+        \begin{center}
+            \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/bert.png}
+        \end{center}
+        \caption{[CLS] token representation is used for classification.}
+    \end{figure}
+    The model is available at \\\url{https://huggingface.co/HooshvareLab/bert-base-parsbert-uncased}. Also you can find the implementation details in src\slash utils\slash parsbert.py file.
+    \subsection{Fine Tuning}\label{subsec:fine-tuning}
+    \begin{lstlisting}[language=bash]
+    python src/main.py fine-tune-parsbert path-to-augmented-csv
+    \end{lstlisting}
+    The below image shows the process of fine tuning parsbert model. The script will check for dataset in data\slash split and if it is not available, it will create it using the augmented data.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/train-bert.png}
+    \end{center}
+    We have used early stopping tequnique to prevent overfitting. The accuracy on validation set is roughly 80\%. 
+    
+    The model is saved in models\slash parsbert\slash best and models\slash parsbert\slash final folder. The best model is the model with the highest accuracy on validation set. The last model is the model at the end of the training process.
+
+    \subsection{Testing}\label{subsec:testing}
+    \begin{lstlisting}[language=bash]
+    python src/main.py test-parsbert
+    \end{lstlisting}
+    \begin{center}
+        \csvautotabular{\rootDir/stats/parsbert_test_results.csv}
+    \end{center}
+
+    \subsection{Inference}\label{subsec:inference}
+    Following image shows how to use our main model for inference. The model will be loaded from models\slash parsbert\slash best folder.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/inference_parsbert.png}
+    \end{center}
+
+    \section{OpenAI API for classification}\label{sec:openai-api-for-classification}
 
     \section{Resources}\label{sec:resources}
     \begin{itemize}

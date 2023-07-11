@@ -15,7 +15,7 @@ from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
 from utils.gpt2 import train_gpt2, prepare_language_model_dataset, gpt2_generator
 from utils.label import get_tweet_label, get_crawled_tweets
-from utils.parsbert import train_parsbert
+from utils.parsbert import train_parsbert, test_parsbert_model, classify_tweet
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
 from utils.split import prepare_dataset
 from utils.stats import (
@@ -397,6 +397,22 @@ def fine_tune_parsbert(path_to_augmented_csv: str):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
     train_parsbert(device)
+
+
+@app.command()
+def test_parsbert():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+    test_parsbert_model(device)
+
+
+@app.command()
+def classify_tweet_parsbert(tweet: str):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+    logger.info(f"Classifying tweet:")
+    logger.info(f"{tweet}")
+    logger.info(f"Predicted label: {classify_tweet(tweet, device)}")
 
 
 @app.command()

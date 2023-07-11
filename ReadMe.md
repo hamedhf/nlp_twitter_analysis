@@ -89,7 +89,7 @@ example: python src/main.py generate-pdf-report 2023-06-02-10-27-57
 
 ### Phase 2
 
-### Augmenting Data
+#### Augmenting Data
 
 ```bash
 python src/main.py augment-data path-to-cleaned-csv
@@ -124,7 +124,7 @@ example: python src/main.py get-most-similar-words all سیاست --topn 10
 python src/main.py get-word2vec-stats
 ```
 
-### fine tuning gpt2
+#### fine tuning gpt2
 
 ```bash
 python src/main.py fine-tune-gpt2 path-to-augmented-csv
@@ -132,21 +132,34 @@ example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-
 example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-10-27-57.csv --desired-label home_and_garden
 ```
 
-### gpt2 completion
+#### gpt2 completion
 
 ```bash
 python src/main.py complete-prompt-gpt2 prompt label
 example: python src/main.py complete-prompt-gpt2 'سیاستمدار همه دروغ' politics_and_current_affairs
 ```
 
-### fine tuning parsbert
+#### fine tuning parsbert
 
 ```bash
 python src/main.py fine-tune-parsbert path-to-augmented-csv
 example: python src/main.py fine-tune-parsbert ../data/augment/augmented_2023-06-02-10-27-57.csv
 ```
 
-### generate phase 2 report
+#### test parsbert
+
+```bash
+python src/main.py test-parsbert
+```
+
+#### classify tweets using parsbert
+
+```bash
+python src/main.py classify-tweet-parsbert tweet
+example: python src/main.py classify-tweet-parsbert 'باید به گل و گیاه رسید.'
+```
+
+#### generate phase 2 report
 
 ```bash
 python src/main.py generate-final-pdf-report
