@@ -301,16 +301,16 @@
     It is important to note that we should set max\_seq length according to the common length of the tweets in the dataset. If we set it a large number, then model will be overfitted on PAD token and it will generate a lot of PAD tokens.
 
     \section{Classification}\label{sec:classification}
-    We have utilized the HooshvareLab/bert-base-parsbert-uncased model, a variant of BERT specifically designed for Persian language processing, to extract features from the tweets for our text classification task. 
+    We have utilized the HooshvareLab/bert-fa-base-uncased model(parsbert v2), a variant of BERT specifically designed for Persian language processing, to extract features from the tweets for our text classification task. 
     The tweets were tokenized using the ParseBERT tokenizer, which splits the text into individual tokens, including special tokens like [CLS] denoting the classification task. 
-    The ParseBERT model, consisting of multiple transformer layers, was then employed to process the tokenized input and learn contextual dependencies among the tokens. By leveraging the pre-trained contextualized representations of the HooshvareLab/bert-base-parsbert-uncased model, we could effectively capture the semantic and syntactic information within the Persian tweets. Finally, the contextualized representation of the [CLS] token was passed through a classification head, enabling the model to map the features to the appropriate number of output labels. This approach empowered us to perform accurate and efficient text classification on Persian tweets.
+    The ParseBERT model, consisting of multiple transformer layers, was then employed to process the tokenized input and learn contextual dependencies among the tokens. By leveraging the pre-trained contextualized representations of the HooshvareLab/bert-fa-base-uncased model, we could effectively capture the semantic and syntactic information within the Persian tweets. Finally, the contextualized representation of the [CLS] token was passed through a classification head, enabling the model to map the features to the appropriate number of output labels. This approach empowered us to perform accurate and efficient text classification on Persian tweets.
     \begin{figure}[H]
         \begin{center}
             \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/bert.png}
         \end{center}
         \caption{[CLS] token representation is used for classification.}
     \end{figure}
-    The model is available at \\\url{https://huggingface.co/HooshvareLab/bert-base-parsbert-uncased}. Also you can find the implementation details in src\slash utils\slash parsbert.py file.
+    The model is available at \\\url{https://huggingface.co/HooshvareLab/bert-fa-base-uncased}. Also you can find the implementation details in src\slash utils\slash parsbert.py file.
     \subsection{Fine Tuning}\label{subsec:fine-tuning}
     \begin{lstlisting}[language=bash]
     python src/main.py fine-tune-parsbert path-to-augmented-csv
@@ -338,11 +338,79 @@
     \end{center}
 
     \section{OpenAI API for classification}\label{sec:openai-api-for-classification}
+    We used OpenAI API to classify the tweets. The following code shows what prompt was given to the API.
+    
+    Probably the most important parameter is the temperature parameter. It controls the randomness of the generated text. The higher the temperature, the more random the generated text is. The lower the temperature, the more predictable the generated text is. The default value is 0.7. We have used 0.2 so that the model be more deterministic.
+    \begin{lstlisting}[language=Python]
+    def get_tweet_label(
+            api_key: str,
+            api_base: str,
+            tweet: str,
+            sleep_seconds: int = 10
+    ) -> str:
+        openai.api_key = api_key
+        openai.api_base = api_base
+        topics = list(TOPICS.values())
+        messages = [
+            {
+                "role": "system",
+                "content": f"Classify the topic of the future tweet into only one of the following categories: {', '.join(topics)}. some of these tweets are in slang persian language. please try to understand them. Just type the topic and nothing else."
+            },
+            {"role": "user", "content": f"Tweet: {tweet}"},
+    
+        ]
+    
+        while True:
+            try:
+                print("*" * 100)
+                print(messages)
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=messages,
+                    temperature=0.2,  # we want the model to be more deterministic
+                )
+                print(response)
+                print("*" * 100)
+                label = str(response['choices'][0]['message']['content']).strip()
+                label = get_clean_label(label)
+                break
+            except (ServiceUnavailableError, APIError, Timeout, RateLimitError):
+                print(f"Some error occurred. Sleeping for {sleep_seconds} seconds and trying again")
+                time.sleep(sleep_seconds)
+            except KeyError:
+                print("KeyError occurred. Setting label to 'unknown'.")
+                label = 'unknown'
+                break
+        return label
+    \end{lstlisting}
+
+    \subsection{Accuracy}\label{subsec:accuracy-openai}
+    \begin{center}
+        \csvautotabular{\rootDir/stats/openai_test_results.csv}
+    \end{center}
+    The accuracy is a little bit better than the parsbert model. It was expected because the model is trained on a huge dataset and it is a state of the art model.
+
+    There are couple of problems with this approach:
+    \begin{itemize}
+        \item Very strict API rate limits. To overcome this we had to shrink the test dataset massively.
+        \item The model is not deterministic. We can lower the randomness by lowering the temperature parameter but at end of the day it is still a random process.
+        \item The model is not open source. We have to use the API which is not free.
+    \end{itemize}
+
+    \subsection{Inference}\label{subsec:inference-openai}
+    The following image shows how to use the OpenAI API for inference.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/inference_openai.png}
+    \end{center}
 
     \section{Resources}\label{sec:resources}
     \begin{itemize}
-        \item \url{https://github.com/hooshvare/parsgpt}
-        \item \url{}
+    \item \url{https://github.com/hooshvare/parsgpt}
+    \item \url{https://huggingface.co/HooshvareLab/bert-fa-base-uncased}
+    \item \url{https://www.geeksforgeeks.org/python-word-embedding-using-word2vec}
+    \item \url{https://www.kaggle.com/code/akshat0007/bert-for-sequence-classification}
+    \item \url{https://www.kaggle.com/code/nulldata/fine-tuning-gpt-2-to-generate-netlfix-descriptions}
+    \item \url{https://colab.research.google.com/github/hooshvare/parsgpt/blob/master/notebooks/Persian_Poetry_FineTuning.ipynb}
     \end{itemize}
 
 \end{document}

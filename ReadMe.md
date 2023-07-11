@@ -159,6 +159,19 @@ python src/main.py classify-tweet-parsbert tweet
 example: python src/main.py classify-tweet-parsbert 'باید به گل و گیاه رسید.'
 ```
 
+#### evaluate openai on test data
+
+```bash
+python src/main.py test-openai
+```
+
+#### classify tweet using openai api
+
+```bash
+python src/main.py classify-tweet-openai tweet
+example: python src/main.py classify-tweet-openai 'باید به گل و گیاه رسید.'
+```
+
 #### generate phase 2 report
 
 ```bash

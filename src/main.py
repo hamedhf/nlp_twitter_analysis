@@ -416,6 +416,61 @@ def classify_tweet_parsbert(tweet: str):
 
 
 @app.command()
+def test_openai(max_tweet_per_label: int = 3):
+    """
+    Max tweet per label has been set to 3 because of openai api rate limit.
+    """
+    dataset_path = "../data/split/test.csv"
+    if not os.path.exists(dataset_path):
+        raise FileNotFoundError("test.csv not found. Please run parsbert fine tuning script first.")
+
+    # prepare test dataset
+    data = {label: [] for label in TOPICS.values()}
+    with open(dataset_path, 'r') as f:
+        lines = f.readlines()[1:]  # skip header
+        for line in lines:
+            tweet, label = line.split(',')
+            label = label[:-1]  # remove \n
+            data[label].append(tweet)
+    for label in TOPICS.values():
+        random.shuffle(data[label])
+        data[label] = data[label][:max_tweet_per_label]
+
+    api_key = get_api_key()
+    api_base = get_api_base_url()
+    total_correct = 0
+    total = 0
+    for label in TOPICS.values():
+        for tweet in data[label]:
+            predicted_label = get_tweet_label(api_key, api_base, tweet)
+            logger.info(f"TWEET: {tweet}")
+            logger.info(f"ACTUAL LABEL: {label}")
+            logger.info(f"PREDICTED LABEL: {predicted_label}")
+            if predicted_label == label:
+                total_correct += 1
+            total += 1
+    accuracy = total_correct / total
+    accuracy = round(accuracy, 4)
+    logger.info(f"Accuracy: {accuracy}")
+
+    # save results to a csv file
+    with open("../stats/openai_test_results.csv", 'w') as f:
+        f.write("total-tweets,total-correct,accuracy\n")
+        f.write(f"{total},{total_correct},{accuracy}")
+
+
+@app.command()
+def classify_tweet_openai(tweet: str):
+    tweet, _ = clean_text(tweet)
+    logger.info(f"Classifying tweet after cleaning:")
+    logger.info(f"{tweet}")
+    api_key = get_api_key()
+    api_base = get_api_base_url()
+    predicted_label = get_tweet_label(api_key, api_base, tweet)
+    logger.info(f"Predicted label: {predicted_label}")
+
+
+@app.command()
 def generate_final_pdf_report(file_timestamp: str = "2023-06-02-10-27-57"):
     latex_pdf_report(2, file_timestamp)
 
