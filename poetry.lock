@@ -154,6 +154,21 @@ files = [
 frozenlist = ">=1.1.0"
 
 [[package]]
+name = "arabic-reshaper"
+version = "3.0.0"
+description = "Reconstruct Arabic sentences to be used in applications that do not support Arabic"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "arabic_reshaper-3.0.0-py3-none-any.whl", hash = "sha256:3f71d5034bb694204a239a6f1ebcf323ac3c5b059de02259235e2016a1a5e2dc"},
+    {file = "arabic_reshaper-3.0.0.tar.gz", hash = "sha256:ffcd13ba5ec007db71c072f5b23f420da92ac7f268512065d49e790e62237099"},
+]
+
+[package.extras]
+with-fonttools = ["fonttools (>=4.0)"]
+
+[[package]]
 name = "async-timeout"
 version = "4.0.2"
 description = "Timeout context manager for asyncio programs"
@@ -3343,4 +3358,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f3340a2cc53e8f1066c17bf25e5c7416bb1cbe10e5fdda49af131acee6fcd034"
+content-hash = "f7d94a47dde64412771f389c9c17e09c81fc85678dcd118b3d8c46759834d41a"

@@ -1,5 +1,6 @@
+import arabic_reshaper
 import matplotlib.pyplot as plt
-from bidi import algorithm as bidialg
+from bidi.algorithm import get_display
 from hazm import lemmatizer
 
 from .constants import TOPICS, PAD_TOKEN
@@ -113,8 +114,9 @@ def get_plot(file_timestamp: str, freq_dict: dict):
     for topic_number, topic in TOPICS.items():
         for word, freq in freq_dict[topic].items():
             plt.scatter(topic_number, freq, marker='x', color='red')
-            text = bidialg.get_display(word)
-            plt.text(topic_number + .03, freq + .03, text, fontsize=9)
+            reshaped_text = arabic_reshaper.reshape(u'{}'.format(word))
+            artext = get_display(reshaped_text)
+            plt.text(topic_number + .03, freq + .03, artext, fontsize=9)
 
     plt.xlabel('Topics')
     plt.ylabel('Word count')
@@ -126,3 +128,11 @@ def write_dict_to_csv(dictionary: dict, path_to_csv: str):
     with open(path_to_csv, 'w') as f:
         f.write(','.join(dictionary.keys()) + '\n')
         f.write(','.join([str(x) for x in dictionary.values()]) + '\n')
+
+
+def write_dict_to_csv2(dictionary: dict, path_to_csv: str, header: str):
+    with open(path_to_csv, 'w') as f:
+        f.write(header + '\n')
+        for key, value in dictionary.items():
+            key = key.replace('_', '\_')
+            f.write(f'{key},{value}\n')

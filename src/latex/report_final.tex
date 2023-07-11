@@ -57,9 +57,8 @@
 \date{\today}
 
 \begin{document}
-    \blindtext
     \thisfloatsetup{%
-    objectset=raggedright,
+        objectset=raggedright,
     }
     \maketitle
     \tableofcontents
@@ -67,53 +66,90 @@
 
 
     \section{Introduction}\label{sec:introduction}
-    This is the final report for the NLP course project. In this project we have collected tweets from Twitter and labeled them using ChatGPT model. Then we have augmented the data using GPT-3.5-turbo model. After that we have trained a classifier using the augmented data and evaluated the results. 
-    
+    This is the final report for the NLP course project. In this project we have collected tweets from Twitter and labeled them using ChatGPT model. Then we have augmented the data using GPT-3.5-turbo model. After that we have trained a classifier using the augmented data and evaluated the results.
+
     Word2vec, tokenizer and language model and other stuffs also have been trained on the collected data, which we will discuss in the following sections.
 
 
     \section{Repository}\label{sec:repository}
     You can access the source code of this project at \url{https://github.com/hamedhf/nlp_twitter_analysis}
 
+
     \section{Installation}\label{sec:installation}
-    You should create a file named "users.csv" inside src folder which contains the Twitter username, University name an Actual name of the users you wish to analyze. 
-    
+    You should create a file named "users.csv" inside src folder which contains the Twitter username, University name an Actual name of the users you wish to analyze.
+
     Furthermore installation instructions are provided in the README.md file of the repository.
+
 
     \section{Project Structure}\label{sec:project-structure}
     \begin{figure}[H]
-    \dirtree{%
-        .1 rootfolder.
-        .2 data.
-        .3 raw.
-        .3 clean.
-        .3 wordbroken.
-        .3 sentencebroken.
-        .3 augment.
-        .3 split.\dotfill\begin{minipage}[t]{5cm}parsbert finetune data\end{minipage}.
-        .3 language\_model.\dotfill\begin{minipage}[t]{5cm}gpt2-fa finetune data\end{minipage}.
-        .2 logs.\dotfill\begin{minipage}[t]{5cm}all project logs\end{minipage}.
-        .2 models.
-        .3 gpt2.\dotfill\begin{minipage}[t]{5cm}gpt2 farsi model\end{minipage}.
-        .3 parsbert.\dotfill\begin{minipage}[t]{5cm}parsbert model\end{minipage}.
-        .3 word2vec.\dotfill\begin{minipage}[t]{5cm}word2vec model\end{minipage}.
-        .2 src.
-        .3 latex.\dotfill\begin{minipage}[t]{5cm}latex source files\end{minipage}.
-        .3 main.py.\dotfill\begin{minipage}[t]{5cm}main script for running commands\end{minipage}.
-        .3 utils.
-        .4 augment.py.\dotfill\begin{minipage}[t]{5cm}augment data using gpt-3.5-turbo\end{minipage}.
-        .4 clean.py.\dotfill\begin{minipage}[t]{5cm}clean data\end{minipage}.
-        .4 crawl.py.\dotfill\begin{minipage}[t]{5cm}crawl data from twitter\end{minipage}.
-        .4 label.py.\dotfill\begin{minipage}[t]{5cm}label data using chatgpt\end{minipage}.
-        .4 split.py.\dotfill\begin{minipage}[t]{5cm}split data into train, test and validation\end{minipage}.
-        .4 constants.py.\dotfill\begin{minipage}[t]{5cm}project constants and configurations\end{minipage}.
-        .4 word2vec.py.\dotfill\begin{minipage}[t]{5cm}train word2vec model\end{minipage}.
-        .4 gpt2.py.\dotfill\begin{minipage}[t]{5cm}train gpt2 model\end{minipage}.
-        .4 parsbert.py.\dotfill\begin{minipage}[t]{5cm}train parsbert model\end{minipage}.
-        .4 ....
-    }
-    \caption{Project Tree}
+        \dirtree{%
+            .1 rootfolder.
+            .2 data.
+            .3 raw.
+            .3 clean.
+            .3 wordbroken.
+            .3 sentencebroken.
+            .3 augment.
+            .3 split.\dotfill\begin{minipage}[t]{5cm}
+                                 parsbert finetune data
+            \end{minipage}.
+            .3 language\_model.\dotfill\begin{minipage}[t]{5cm}
+                                           gpt2-fa finetune data
+            \end{minipage}.
+            .2 logs.\dotfill\begin{minipage}[t]{5cm}
+                                all project logs
+            \end{minipage}.
+            .2 models.
+            .3 gpt2.\dotfill\begin{minipage}[t]{5cm}
+                                gpt2 farsi model
+            \end{minipage}.
+            .3 parsbert.\dotfill\begin{minipage}[t]{5cm}
+                                    parsbert model
+            \end{minipage}.
+            .3 word2vec.\dotfill\begin{minipage}[t]{5cm}
+                                    word2vec model
+            \end{minipage}.
+            .2 src.
+            .3 latex.\dotfill\begin{minipage}[t]{5cm}
+                                 latex source files
+            \end{minipage}.
+            .3 main.py.\dotfill\begin{minipage}[t]{5cm}
+                                   main script for running commands
+            \end{minipage}.
+            .3 utils.
+            .4 augment.py.\dotfill\begin{minipage}[t]{5cm}
+                                      augment data using gpt-3.5-turbo
+            \end{minipage}.
+            .4 clean.py.\dotfill\begin{minipage}[t]{5cm}
+                                    clean data
+            \end{minipage}.
+            .4 crawl.py.\dotfill\begin{minipage}[t]{5cm}
+                                    crawl data from twitter
+            \end{minipage}.
+            .4 label.py.\dotfill\begin{minipage}[t]{5cm}
+                                    label data using chatgpt
+            \end{minipage}.
+            .4 split.py.\dotfill\begin{minipage}[t]{5cm}
+                                    split data into train, test and validation
+            \end{minipage}.
+            .4 constants.py.\dotfill\begin{minipage}[t]{5cm}
+                                        project constants and configurations
+            \end{minipage}.
+            .4 word2vec.py.\dotfill\begin{minipage}[t]{5cm}
+                                       train word2vec model
+            \end{minipage}.
+            .4 gpt2.py.\dotfill\begin{minipage}[t]{5cm}
+                                   train gpt2 model
+            \end{minipage}.
+            .4 parsbert.py.\dotfill\begin{minipage}[t]{5cm}
+                                       train parsbert model
+            \end{minipage}.
+            .4 ....
+        }
+        \caption{Project Tree}
     \end{figure}
+
 
     \section{Data Collection}\label{sec:data-collection}
     We used selenium $>=$ 4.6.0 for collecting data from Twitter. This tool helps us to bring up an actual browser and navigate through the pages. Note that you should have Chrome installed on your system for this to work. Then you can simply install other dependencies form pyproject.toml file using poetry or other package managers.
@@ -171,12 +207,57 @@
 
     Using this approach we have doubled our total data size and each label has at least 200 tweets. It is worth mentioning that because of openai api rate limit, it took us about \textbf{2 and a half days} to generate the data.
 
+    \subsection{Generated Tweets}\label{subsec:generated-tweets}
     Some of the generated tweets:
     \begin{center}
         \includegraphics[width=1\textwidth]{images/generated_tweets.png}
     \end{center}
 
+    \subsection{Augmented Data Statistics}\label{subsec:augmented-data-statistics}
+    \begin{center}
+        \csvreader[tabular=|c|c|c|,
+        table head=\hline & label & tweet count\\ \hline,
+        late after line=\\ \hline
+        ]{\rootDir/stats/augmented_counts.csv}{}{
+            \thecsvrow & \csvcoli & \csvcolii
+        }
+    \end{center}
 
     \section{Word2Vec}\label{sec:word2vec}
+    We used gensim library for training skipgram word2vec model because it is easy to use and fast. The implementation is in src\slash utils\slash word2vec.py file.
+
+    All ot the available commands are listed in \textbf{ReadME.md} file. Here we explain some of them.
+    \subsection{Training}\label{subsec:training}
+    This command trains word2vec for a specific label.
+    \begin{lstlisting}[language=bash]
+    python src/main.py train-word2vec-label path-to-augmented-csv home_and_garden
+    \end{lstlisting}
+
+    This command trains word2vec for some preselected labels.
+    \begin{lstlisting}[language=bash]
+    python src/main.py train-word2vec-preselected path-to-augmented-csv
+    \end{lstlisting}
+
+    This command trains word2vec for all labels.
+    \begin{lstlisting}[language=bash]
+    python src/main.py train-word2vec-all path-to-augmented-csv
+    \end{lstlisting}
+
+    \subsection{Evaluation}\label{subsec:evaluation}
+    Let's find that in topic of home\_and\_ garden, which words are similar to the Persian word for home (khaneh).
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/home_and_garden.png}
+    \end{center}
+    
+    Some of the similarity results are shown in the following image. We use cosine similarity for measuring the similarity between two words. The higher the similarity, the more similar the words are.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/stats/word2vec_similar.png}
+    \end{center}
+
+    \section{Resources}\label{sec:resources}
+    \begin{itemize}
+        \item \url{}
+        \item \url{}
+    \end{itemize}
 
 \end{document}

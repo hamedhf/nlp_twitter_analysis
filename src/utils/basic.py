@@ -76,7 +76,9 @@ def latex_pdf_report(phase: int, file_timestamp: str):
         tmp_file.write(latex_source)
 
     command = f'pdflatex -output-directory={root_dir}/src/latex -jobname=Phase{phase}-Report {root_dir}/src/latex/tmp.tex'  # noqa
-    os.system(command)
+    # run pdflatex twice to generate table of contents
+    for _ in range(2):
+        os.system(command)
 
     pdf_save_path = root_dir + f'/Phase{phase}-Report.pdf'
     os.rename(f'{root_dir}/src/latex/Phase{phase}-Report.pdf', pdf_save_path)

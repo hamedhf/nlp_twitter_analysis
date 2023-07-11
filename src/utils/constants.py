@@ -31,6 +31,9 @@ TOPICS = {
 PAD_TOKEN_OLD = 'PAD'
 PAD_TOKEN = '<PAD>'
 
+PRESELECTED_LABELS = ["politics_and_current_affairs", "education_and_learning", "environment_and_sustainability",
+                      "home_and_garden", "weather_and_seasons"]
+
 
 def get_api_base_url():
     api_base_url = os.getenv("OPENAI_API_BASE_URL")

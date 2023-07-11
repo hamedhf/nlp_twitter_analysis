@@ -24,9 +24,9 @@ from utils.stats import (
     get_unique_word_count,
     write_dict_to_csv,
     top_ten_frequent_word_per_label,
-    get_plot
+    get_plot, write_dict_to_csv2
 )
-from utils.word2vec import train_for_label, train_for_all
+from utils.word2vec import train_for_label, train_for_all, load_w2v_model, get_w2v_stats
 
 app = typer.Typer()
 current_dir = None
@@ -281,6 +281,8 @@ def augment_data(path_to_clean_csv: str, min_tweet_count_per_label: int = 200):
 
     counts = get_tweet_count_per_label(augmented_file_path)
     print(f"augmented data counts: {counts}")
+    # save counts to csv
+    write_dict_to_csv2(counts, '../stats/augmented_counts.csv', 'label,tweet count')
 
 
 @app.command()
@@ -294,6 +296,19 @@ def train_word2vec_label(path_to_clean_csv: str, label: str):
     model = train_for_label(path_to_clean_csv, label)
     model.save(f'../models/word2vec/{label}.npy')
     logger.info(f"Model saved at {parr_dir}/models/word2vec/{label}.npy")
+
+
+@app.command()
+def get_most_similar_words(label: str, word: str, topn: int = 10):
+    model = load_w2v_model(label)
+    logger.info(f"Most similar words to {word} in {label} are:")
+    for word, similarity in model.wv.most_similar(word, topn=topn):
+        logger.info(f"{similarity} \t {word}")
+
+
+@app.command()
+def get_word2vec_stats():
+    get_w2v_stats()
 
 
 @app.command()

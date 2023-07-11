@@ -115,6 +115,15 @@ python src/main.py train-word2vec-all path-to-augmented-csv
 example: python src/main.py train-word2vec-all ../data/augment/augmented_2023-06-02-10-27-57.csv
 ```
 
+```bash
+python src/main.py get-most-similar-words label word --topn 10
+example: python src/main.py get-most-similar-words all سیاست --topn 10
+```
+
+```bash
+python src/main.py get-word2vec-stats
+```
+
 ### fine tuning gpt2
 
 ```bash
