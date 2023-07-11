@@ -1,0 +1,182 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{csvsimple}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{dirtree}
+\usepackage{floatrow}
+\usepackage{blindtext}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\def\timestamp{2023-06-02-10-27-57}
+\def\rootDir{../..}
+\def\csvStats{\rootDir/stats/stats_\timestamp.csv}
+\def\pngStats{\rootDir/stats/plot_\timestamp.png}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+\pgfplotsset{width=10cm}
+
+\title{NLP Twitter Analysis}
+\author{Hamed Feizabadi}
+\date{\today}
+
+\begin{document}
+    \blindtext
+    \thisfloatsetup{%
+    objectset=raggedright,
+    }
+    \maketitle
+    \tableofcontents
+    \newpage
+
+
+    \section{Introduction}\label{sec:introduction}
+    This is the final report for the NLP course project. In this project we have collected tweets from Twitter and labeled them using ChatGPT model. Then we have augmented the data using GPT-3.5-turbo model. After that we have trained a classifier using the augmented data and evaluated the results. 
+    
+    Word2vec, tokenizer and language model and other stuffs also have been trained on the collected data, which we will discuss in the following sections.
+
+
+    \section{Repository}\label{sec:repository}
+    You can access the source code of this project at \url{https://github.com/hamedhf/nlp_twitter_analysis}
+
+    \section{Installation}\label{sec:installation}
+    You should create a file named "users.csv" inside src folder which contains the Twitter username, University name an Actual name of the users you wish to analyze. 
+    
+    Furthermore installation instructions are provided in the README.md file of the repository.
+
+    \section{Project Structure}\label{sec:project-structure}
+    \begin{figure}[H]
+    \dirtree{%
+        .1 rootfolder.
+        .2 data.
+        .3 raw.
+        .3 clean.
+        .3 wordbroken.
+        .3 sentencebroken.
+        .3 augment.
+        .3 split.\dotfill\begin{minipage}[t]{5cm}parsbert finetune data\end{minipage}.
+        .3 language\_model.\dotfill\begin{minipage}[t]{5cm}gpt2-fa finetune data\end{minipage}.
+        .2 logs.\dotfill\begin{minipage}[t]{5cm}all project logs\end{minipage}.
+        .2 models.
+        .3 gpt2.\dotfill\begin{minipage}[t]{5cm}gpt2 farsi model\end{minipage}.
+        .3 parsbert.\dotfill\begin{minipage}[t]{5cm}parsbert model\end{minipage}.
+        .3 word2vec.\dotfill\begin{minipage}[t]{5cm}word2vec model\end{minipage}.
+        .2 src.
+        .3 latex.\dotfill\begin{minipage}[t]{5cm}latex source files\end{minipage}.
+        .3 main.py.\dotfill\begin{minipage}[t]{5cm}main script for running commands\end{minipage}.
+        .3 utils.
+        .4 augment.py.\dotfill\begin{minipage}[t]{5cm}augment data using gpt-3.5-turbo\end{minipage}.
+        .4 clean.py.\dotfill\begin{minipage}[t]{5cm}clean data\end{minipage}.
+        .4 crawl.py.\dotfill\begin{minipage}[t]{5cm}crawl data from twitter\end{minipage}.
+        .4 label.py.\dotfill\begin{minipage}[t]{5cm}label data using chatgpt\end{minipage}.
+        .4 split.py.\dotfill\begin{minipage}[t]{5cm}split data into train, test and validation\end{minipage}.
+        .4 constants.py.\dotfill\begin{minipage}[t]{5cm}project constants and configurations\end{minipage}.
+        .4 word2vec.py.\dotfill\begin{minipage}[t]{5cm}train word2vec model\end{minipage}.
+        .4 gpt2.py.\dotfill\begin{minipage}[t]{5cm}train gpt2 model\end{minipage}.
+        .4 parsbert.py.\dotfill\begin{minipage}[t]{5cm}train parsbert model\end{minipage}.
+        .4 ....
+    }
+    \caption{Project Tree}
+    \end{figure}
+
+    \section{Data Collection}\label{sec:data-collection}
+    We used selenium $>=$ 4.6.0 for collecting data from Twitter. This tool helps us to bring up an actual browser and navigate through the pages. Note that you should have Chrome installed on your system for this to work. Then you can simply install other dependencies form pyproject.toml file using poetry or other package managers.
+    The crawler script reads the users.csv file and for each user, it navigates to the user's profile and collects the tweets. The tweets are stored in a file named unlabeled.db inside data\slash raw folder. Then labeling script uses this and with the help of ChatGPT model, it generates the labels for each tweet and stores them in data\slash raw\slash labeled-run-date.csv file.
+
+
+    \section{Data Format}\label{sec:data-format}
+    The data is stored in a csv file with the following format:\\ tweet\_time, tweet\_owner, tweet\_text, owner\_university, owner\_name, label.
+    We use tweet\_time, tweet\_owner as unique identifiers for each tweet. The tweet\_owner is Twitter username of the owner. The tweet\_text is the actual text of the tweet. owner\_university and owner\_name are the university and actual name of the tweet owner. The label is the generated label for the tweet.
+
+
+    \section{Data Preprocessing}\label{sec:data-preprocessing}
+    We have splitted data with three criteria: split by sentence with hazm sentence tokenizer, split by word with hazm word tokenizer, split by word with hazm lemmatizer.
+
+    For cleaning the data, we used the following steps: remove emojis, remove urls, remove hashtags, remove mentions, remove numbers, remove punctuations. We used the hazm, cleantext and nltk libraries for this purpose.
+
+
+    \section{Labeling}\label{sec:labeling}
+    We give label to the whole tweet using ChatGPT. For more info about labeling see the src\slash utils\slash label.py file. You can also see the labels in src\slash utils\slash constants.py file.
+
+
+    \section{Statistics}\label{sec:statistics}
+    \csvautotabular{\csvStats}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\pngStats}
+    \end{center}
+
+
+    \section{Augmenting Data}\label{sec:augmenting-data}
+    For this part to work you need to sign up for an account at \url{https://platform.openai.com} and provide your openai api key in .env file. Then you can run the augment-data command.
+
+    The augmentation script takes a cleaned csv file as input and counts how many tweet we have for each label. Then it will fix the imbalance of the data by generating new tweets for the labels with less tweets. The generated tweets are stored in data\slash augment folder.
+
+    You can see the implementation detail of the augmentation script in src\slash utils\slash augment.py file. We have used gpt-3.5-turbo model for this purpose and the given prompt is like this:
+    \begin{lstlisting}[language=Python]
+    import openai
+    label = "home_and_garden"
+    temperature = 0.6
+    system_message = "Generate an informal Persian tweet about the given topic without any hashtags, mentions, links, or emojis."  # noqa
+    messages = [
+        {
+            "role": "system",
+            "content": system_message
+        },
+        {"role": "user", "content": f"topic: {label}"}
+    ]
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=temperature,
+        timeout=120
+    )
+    \end{lstlisting}
+    Temperature is a parameter that controls the randomness of the generated text. The higher the temperature, the more random the text. The lower the temperature, the more predictable the text. We have used 0.6 for this parameter and it is random enough for our purpose and if we increase it will take much more time to generate the text and this is not practical for our purpose.
+
+    Using this approach we have doubled our total data size and each label has at least 200 tweets. It is worth mentioning that because of openai api rate limit, it took us about \textbf{2 and a half days} to generate the data.
+
+    Some of the generated tweets:
+    \begin{center}
+        \includegraphics[width=1\textwidth]{images/generated_tweets.png}
+    \end{center}
+
+
+    \section{Word2Vec}\label{sec:word2vec}
+
+\end{document}

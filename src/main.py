@@ -1,7 +1,6 @@
 import logging
 import os
 import random
-import re
 from datetime import datetime
 
 import torch
@@ -10,7 +9,7 @@ from dotenv import load_dotenv
 from selenium import webdriver
 
 from utils.augment import get_tweet_count_per_label, augment_label, append_augmented_data
-from utils.basic import check_necessary_files
+from utils.basic import check_necessary_files, latex_pdf_report
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
 from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
@@ -244,38 +243,7 @@ def get_stats(file_timestamp: str):
 
 @app.command()
 def generate_pdf_report(file_timestamp: str):
-    root_dir = os.path.dirname(os.path.realpath(__file__))
-    root_dir = os.path.abspath(os.path.join(root_dir, os.pardir))
-    latex_source_path = 'latex/report.tex'
-
-    with open(latex_source_path, 'r') as latex_file:
-        latex_source = latex_file.read()
-
-    # replacing variables \def\timestamp{2023-06-02-10-27-57}
-    latex_source = latex_source.replace(
-        r'\def\timestamp{2023-06-02-10-27-57}',
-        r'\def\timestamp{' + file_timestamp + '}'
-    )
-    latex_source = latex_source.replace(
-        r'\def\rootDir{../..}',
-        r'\def\rootDir{' + root_dir + '}'
-    )
-
-    tmp_file_path = 'latex/tmp.tex'
-    with open(tmp_file_path, 'w') as tmp_file:
-        tmp_file.write(latex_source)
-
-    command = 'pdflatex -output-directory=./latex -jobname=Phase1-Report ./latex/tmp.tex'  # noqa
-    os.system(command)
-
-    pdf_save_path = root_dir + '/Phase1-Report.pdf'
-    os.rename(f'{root_dir}/src/latex/Phase1-Report.pdf', pdf_save_path)
-    logger.info("PDF report generated at {}".format(pdf_save_path))
-
-    pattern = r'^Phase1-Report.*' + '|' + r'^tmp.*' + '|' + r'^report.*'
-    for f in os.listdir('./latex'):
-        if re.search(pattern, f) and f != 'report.tex':
-            os.remove(os.path.join('./latex', f))
+    latex_pdf_report(1, file_timestamp)
 
 
 @app.command()
@@ -399,6 +367,11 @@ def fine_tune_parsbert(path_to_augmented_csv: str):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
     train_parsbert(device)
+
+
+@app.command()
+def generate_final_pdf_report(file_timestamp: str = "2023-06-02-10-27-57"):
+    latex_pdf_report(2, file_timestamp)
 
 
 if __name__ == "__main__":
