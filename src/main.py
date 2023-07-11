@@ -13,7 +13,7 @@ from utils.basic import check_necessary_files, latex_pdf_report
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
 from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
-from utils.gpt2 import train_gpt2, prepare_language_model_dataset
+from utils.gpt2 import train_gpt2, prepare_language_model_dataset, gpt2_generator
 from utils.label import get_tweet_label, get_crawled_tweets
 from utils.parsbert import train_parsbert
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
@@ -299,19 +299,6 @@ def train_word2vec_label(path_to_clean_csv: str, label: str):
 
 
 @app.command()
-def get_most_similar_words(label: str, word: str, topn: int = 10):
-    model = load_w2v_model(label)
-    logger.info(f"Most similar words to {word} in {label} are:")
-    for word, similarity in model.wv.most_similar(word, topn=topn):
-        logger.info(f"{similarity} \t {word}")
-
-
-@app.command()
-def get_word2vec_stats():
-    get_w2v_stats()
-
-
-@app.command()
 def train_word2vec_preselected(path_to_clean_csv: str):
     # check clean.csv exists
     if not os.path.exists(path_to_clean_csv):
@@ -341,6 +328,19 @@ def train_word2vec_all(path_to_clean_csv: str):
 
 
 @app.command()
+def get_most_similar_words(label: str, word: str, topn: int = 10):
+    model = load_w2v_model(label)
+    logger.info(f"Most similar words to {word} in {label} are:")
+    for word, similarity in model.wv.most_similar(word, topn=topn):
+        logger.info(f"{similarity} \t {word}")
+
+
+@app.command()
+def get_word2vec_stats():
+    get_w2v_stats()
+
+
+@app.command()
 def fine_tune_gpt2(path_to_augmented_csv: str, desired_label: str = None):
     logger.info("Fine tuning gpt2...")
     if not os.path.exists(path_to_augmented_csv):
@@ -367,6 +367,21 @@ def fine_tune_gpt2(path_to_augmented_csv: str, desired_label: str = None):
     for label in desired_labels:
         logger.info(f"Fine tuning gpt2 for label: {label}")
         train_gpt2(label, device)
+
+
+@app.command()
+def complete_prompt_gpt2(prompt: str, label: str):
+    if label not in TOPICS.values():
+        raise ValueError(f"Invalid label. Please provide a valid label. Valid labels are: {TOPICS.values()}")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+
+    logger.info(f"Completing prompt: {prompt}")
+    generated_outputs = gpt2_generator(prompt, label, device)
+    logger.info(f"Generated outputs:")
+    for output in generated_outputs:
+        logger.info(f"{output}")
 
 
 @app.command()

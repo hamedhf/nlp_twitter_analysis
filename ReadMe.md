@@ -132,6 +132,13 @@ example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-
 example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-10-27-57.csv --desired-label home_and_garden
 ```
 
+### gpt2 completion
+
+```bash
+python src/main.py complete-prompt-gpt2 prompt label
+example: python src/main.py complete-prompt-gpt2 'سیاستمدار همه دروغ' politics_and_current_affairs
+```
+
 ### fine tuning parsbert
 
 ```bash

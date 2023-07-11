@@ -19,6 +19,7 @@ from .constants import TOPICS
 MODEL_NAME = 'HooshvareLab/gpt2-fa'
 CACHE_DIR = '../models/huggingface_cache'
 BOS_TOKEN = '<s>'
+START_OF_TEXT_TOKEN = '<|startoftext|>'  # this token is used to indicate start of text for language modeling task
 EOS_TOKEN = '</s>'
 PAD_TOKEN = '<pad>'
 UNK_TOKEN = '<unk>'
@@ -52,7 +53,7 @@ def prepare_language_model_dataset(path_to_augmented_csv: str):
 
 
 class TweetDataset(Dataset):
-    def __init__(self, tweets, tokenizer, max_length=1024):
+    def __init__(self, tweets, tokenizer, max_length=128):
         self.tokenizer = tokenizer  # the gp2 tokenizer we instantiated
         self.input_ids = []
         self.attn_masks = []
@@ -230,8 +231,8 @@ def train_gpt2(label: str, device: torch.device):
     tweets = pd.read_csv(csv_path)['tweet'].tolist()
 
     # max_seq = max([len(tokenizer.encode(tweet)) for tweet in tweets])
-    # Due to the limited resources and for the sake of simplicity and speed, we set the max_seq to 256
-    max_seq = 256
+    # Due to the limited resources and for the sake of simplicity and speed, we set the max_seq to 128
+    max_seq = 128
 
     dataset = TweetDataset(tweets, tokenizer, max_length=max_seq)
     train_size = int(0.8 * len(dataset))
@@ -261,14 +262,14 @@ def train_gpt2(label: str, device: torch.device):
     model = model.to(device)
 
     # This step is optional but will enable reproducible runs.
-    seed_val = 42
+    # seed_val = 42
+    # random.seed(seed_val)
+    # np.random.seed(seed_val)
+    # torch.manual_seed(seed_val)
+    # if torch.cuda.is_available():
+    #     torch.cuda.manual_seed_all(seed_val)
 
-    random.seed(seed_val)
-    np.random.seed(seed_val)
-    torch.manual_seed(seed_val)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed_val)
-    epochs = 3
+    epochs = 4
     warmup_steps = 1e2
 
     optimizer = AdamW(
@@ -329,3 +330,41 @@ def train_gpt2(label: str, device: torch.device):
     model.save_pretrained(path_to_model)
     tokenizer.save_pretrained(path_to_model)
     configuration.save_pretrained(path_to_model)
+
+
+def gpt2_generator(prompt: str, label: str, device: torch.device, max_length=128, num_return_sequences=3) -> list:
+    model_folder_path = f'../models/gpt2/{label}/'
+    model_path = model_folder_path + 'pytorch_model.bin'
+    if not os.path.exists(model_path):
+        raise FileNotFoundError("Model doesn't exist, please train it first!")
+
+    configuration = GPT2Config.from_pretrained(model_folder_path, output_hidden_states=False)
+    model = GPT2LMHeadModel.from_pretrained(model_folder_path, config=configuration)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_folder_path,
+        bos_token=BOS_TOKEN,
+        eos_token=EOS_TOKEN,
+        pad_token=PAD_TOKEN
+    )
+    model.resize_token_embeddings(len(tokenizer))
+    model = model.to(device)
+    model.eval()
+
+    prompt = BOS_TOKEN + prompt + START_OF_TEXT_TOKEN
+    generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
+    generated = generated.to(device)
+    print(f"This is what the model is given as input: {prompt}")
+
+    decoded_outputs = model.generate(
+        generated,
+        do_sample=True,
+        top_k=50,
+        max_length=max_length,
+        top_p=0.95,
+        num_return_sequences=num_return_sequences
+    )
+    outputs = []
+    for i, output in enumerate(decoded_outputs):
+        gen_sample_output = tokenizer.decode(output, skip_special_tokens=True)
+        outputs.append(gen_sample_output)
+    return outputs

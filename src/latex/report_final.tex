@@ -10,7 +10,7 @@
 \usepackage{listings}
 \usepackage{dirtree}
 \usepackage{floatrow}
-\usepackage{blindtext}
+\usepackage{subfigure}
 
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -74,6 +74,8 @@
     \section{Repository}\label{sec:repository}
     You can access the source code of this project at \url{https://github.com/hamedhf/nlp_twitter_analysis}
 
+    \section{Requirements}\label{sec:requirements}
+    If you have a GPU(especially Nvidia) then you are good to go and can run project locally, as we did. Otherwise you can use Google Colab to run the project. For that purpose you need to clone the github repo inside colab and run the commands provided with main.py file. These commands are also provided in the README.md file of the repository.
 
     \section{Installation}\label{sec:installation}
     You should create a file named "users.csv" inside src folder which contains the Twitter username, University name an Actual name of the users you wish to analyze.
@@ -242,21 +244,65 @@
     \begin{lstlisting}[language=bash]
     python src/main.py train-word2vec-all path-to-augmented-csv
     \end{lstlisting}
+    Each model is saved in a models\slash word2vec\slash label.npy file.
 
     \subsection{Evaluation}\label{subsec:evaluation}
     Let's find that in topic of home\_and\_ garden, which words are similar to the Persian word for home (khaneh).
     \begin{center}
         \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/home_and_garden.png}
     \end{center}
-    
+
     Some of the similarity results are shown in the following image. We use cosine similarity for measuring the similarity between two words. The higher the similarity, the more similar the words are.
     \begin{center}
         \includegraphics[width=1\textwidth]{\rootDir/stats/word2vec_similar.png}
     \end{center}
 
+    \section{Language Model}\label{sec:language-model}
+    We used huggingface transformers library for training the language model. The implementation is in src\slash utils\slash gpt2.py file. We used HooshvareLab/gpt2-fa model for this purpose. The model is trained on huge Persian corpus and it is available at \url{https://huggingface.co/HooshvareLab/gpt2-fa}. Use of pretained model helps us gain better results with less data.
+    
+    \subsection{Fine Tuning}\label{subsec:fine-tuning}
+    The below command shows how to fine tune the model for a specific label. The script will check for dataset in data\slash languagemodel and if it is not available, it will create it using the augmented data. Then it will fine tune the model for the given label and save the model in models\slash gpt2\slash label folder.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/train-gpt2.png}
+    \end{center}
+
+    \subsubsection{Training and Validation Loss}\label{subsubsec:training-and-validation-loss}
+    Following image shows the training and validation loss for some of the preselected labels, which you can see the list of them in src\slash utils\slash constants.py file. Also you can fine tune the model for them too. If you provide a label then it will be fine tuned for that label, otherwise it will be fine tuned for all of the preselected labels.
+    \begin{figure}[H]
+        \centering
+        \subfigure[education\_and\_learning]{
+        \includegraphics[width=0.4\textwidth]{\rootDir/stats/plot_gpt2_finetuning_education_and_learning.png}
+        }
+        \subfigure[environment\_and\_sustainability]{
+        \includegraphics[width=0.4\textwidth]{\rootDir/stats/plot_gpt2_finetuning_environment_and_sustainability.png}
+        }
+        
+        \subfigure[home\_and\_garden]{
+        \includegraphics[width=0.4\textwidth]{\rootDir/stats/plot_gpt2_finetuning_home_and_garden.png}
+        }
+    \end{figure}
+
+    \begin{figure}[H]
+        \subfigure[politics\_and\_current\_affairs]{
+        \includegraphics[width=0.4\textwidth]{\rootDir/stats/plot_gpt2_finetuning_politics_and_current_affairs.png}
+        }
+
+        \subfigure[weather\_and\_seasons]{
+        \includegraphics[width=0.4\textwidth]{\rootDir/stats/plot_gpt2_finetuning_weather_and_seasons.png}
+        }    
+    \end{figure}
+    All implementation details are in src\slash utils\slash gpt2.py file. Each model is saved in models\slash gpt2\slash label folder.
+
+    \subsection{Generating Tweets}\label{sec:generating-tweets}
+    If we fine tune gpt2-fa on politics label amd we give it prompt about politics, we expect it to generate a tweet about politics. The following image shows the result of this experiment.
+    \begin{center}
+        \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/gpt2_generation.png}
+    \end{center}
+    It is important to note that we should set max\_seq length according to the common length of the tweets in the dataset. If we set it a large number, then model will be overfitted on PAD token and it will generate a lot of PAD tokens.
+
     \section{Resources}\label{sec:resources}
     \begin{itemize}
-        \item \url{}
+        \item \url{https://github.com/hooshvare/parsgpt}
         \item \url{}
     \end{itemize}
 
