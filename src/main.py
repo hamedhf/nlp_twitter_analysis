@@ -14,6 +14,7 @@ from utils.basic import check_necessary_files
 from utils.clean import clean_text, get_clean_label, translate_english_to_persian
 from utils.constants import get_api_key, get_api_base_url, TOPICS
 from utils.crawl import crawl_tweets_by_username, get_users, save_tweets, create_unlabeled_table
+from utils.gpt2 import train_gpt2, prepare_language_model_dataset
 from utils.label import get_tweet_label, get_crawled_tweets
 from utils.parsbert import train_parsbert
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
@@ -354,6 +355,35 @@ def train_word2vec_all(path_to_clean_csv: str):
     model = train_for_all(path_to_clean_csv)
     model.save(f'../models/word2vec/all.npy')
     logger.info(f"Model saved at {parr_dir}/models/word2vec/all.npy")
+
+
+@app.command()
+def fine_tune_gpt2(path_to_augmented_csv: str, desired_label: str = None):
+    logger.info("Fine tuning gpt2...")
+    if not os.path.exists(path_to_augmented_csv):
+        raise FileNotFoundError("augmented.csv not found. Please provide a valid csv file or run augment_data first.")
+    csv_files = os.listdir("../data/languagemodel")
+    for label in TOPICS.values():
+        if f"{label}.csv" not in csv_files:
+            logger.info("Preparing dataset for language modeling.")
+            prepare_language_model_dataset(path_to_augmented_csv)
+            break
+    else:
+        logger.info("Dataset already prepared. Skipping preparation step.")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+
+    if desired_label is None:
+        desired_labels = ["politics_and_current_affairs", "education_and_learning", "environment_and_sustainability",
+                          "home_and_garden", "weather_and_seasons"]
+    else:
+        if desired_label not in TOPICS.values():
+            raise ValueError(f"Invalid label. Please provide a valid label. Valid labels are: {TOPICS.values()}")
+        desired_labels = [desired_label]
+
+    for label in desired_labels:
+        logger.info(f"Fine tuning gpt2 for label: {label}")
+        train_gpt2(label, device)
 
 
 @app.command()

@@ -173,3 +173,6 @@ models/huggingface_cache
 models/parsbert/best/pytorch_model.bin
 models/parsbert/final/pytorch_model.bin
 logs/
+# this file is too large to be uploaded to github
+pytorch_model.bin
+

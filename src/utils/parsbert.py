@@ -76,7 +76,7 @@ def train_parsbert(device: torch.device):
 
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=len(TOPICS.values()),
                                                                cache_dir=cache_dir)
-    model.to(device)
+    model = model.to(device)
 
     optimizer = AdamW(model.parameters(), lr=2e-5)
     epochs = 10

@@ -38,6 +38,12 @@ def check_necessary_files():
     if not os.path.exists('../models/parsbert'):
         os.mkdir('../models/parsbert')
 
+    if not os.path.exists('../models/gpt2'):
+        os.mkdir('../models/gpt2')
+
+    if not os.path.exists('../models/gpt2/base_persian'):
+        os.mkdir('../models/gpt2/base_persian')
+
     if not os.path.exists('../models/huggingface_cache'):
         os.mkdir('../models/huggingface_cache')
 

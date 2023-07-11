@@ -93,7 +93,13 @@ example: python src/main.py train-word2vec-preselected ../data/augment/augmented
 python src/main.py train-word2vec-all path-to-augmented-csv
 example: python src/main.py train-word2vec-all ../data/augment/augmented_2023-06-02-10-27-57.csv
 ```
-### fine-tuning-parsbert
+### fine tuning gpt2
+```bash
+python src/main.py fine-tune-gpt2 path-to-augmented-csv
+example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-10-27-57.csv
+example: python src/main.py fine-tune-gpt2 ../data/augment/augmented_2023-06-02-10-27-57.csv --desired-label home_and_garden
+```
+### fine tuning parsbert
 ```bash
 python src/main.py fine-tune-parsbert path-to-augmented-csv
 example: python src/main.py fine-tune-parsbert ../data/augment/augmented_2023-06-02-10-27-57.csv
