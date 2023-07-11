@@ -11,6 +11,7 @@
 \usepackage{dirtree}
 \usepackage{floatrow}
 \usepackage{subfigure}
+\usepackage{xurl}
 
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -328,7 +329,7 @@
         \end{center}
         \caption{[CLS] token representation is used for classification.}
     \end{figure}
-    The model is available at \\\url{https://huggingface.co/HooshvareLab/bert-fa-base-uncased}. Also you can find the implementation details in src\slash utils\slash parsbert.py file.
+    The model is available at \url{https://huggingface.co/HooshvareLab/bert-fa-base-uncased}. Also you can find the implementation details in src\slash utils\slash parsbert.py file.
     \subsection{Fine Tuning}\label{subsec:fine-tuning}
     \begin{lstlisting}[language=bash]
     python src/main.py fine-tune-parsbert path-to-augmented-csv
@@ -433,6 +434,7 @@
     \item \url{https://www.kaggle.com/code/akshat0007/bert-for-sequence-classification}
     \item \url{https://www.kaggle.com/code/nulldata/fine-tuning-gpt-2-to-generate-netlfix-descriptions}
     \item \url{https://colab.research.google.com/github/hooshvare/parsgpt/blob/master/notebooks/Persian_Poetry_FineTuning.ipynb}
+    \item \url{https://medium.com/geekculture/easy-sentencepiece-for-subword-tokenization-in-python-and-tensorflow-4361a1ed8e39}
     \end{itemize}
 
 \end{document}
