@@ -36,6 +36,9 @@ def check_necessary_files():
     if not os.path.exists('../models/word2vec'):
         os.mkdir('../models/word2vec')
 
+    if not os.path.exists('../models/spm_tokenizer'):
+        os.mkdir('../models/spm_tokenizer')
+
     if not os.path.exists('../models/parsbert'):
         os.mkdir('../models/parsbert')
 

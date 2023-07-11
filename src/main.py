@@ -17,6 +17,7 @@ from utils.gpt2 import train_gpt2, prepare_language_model_dataset, gpt2_generato
 from utils.label import get_tweet_label, get_crawled_tweets
 from utils.parsbert import train_parsbert, test_parsbert_model, classify_tweet
 from utils.segment import simple_word_tokenizer, pad_list, simple_sentence_tokenizer
+from utils.sentencepiece import train_spm_tokenizer
 from utils.split import prepare_dataset
 from utils.stats import (
     get_tweet_count,
@@ -338,6 +339,31 @@ def get_most_similar_words(label: str, word: str, topn: int = 10):
 @app.command()
 def get_word2vec_stats():
     get_w2v_stats()
+
+
+@app.command()
+def train_tokenizer(path_to_augmented_csv: str, vocab_size: int = None):
+    logger.info("Training tokenizer...")
+    generate_stats = False
+
+    if vocab_size is None:
+        vocab_sizes = [100, 1000]
+        generate_stats = True
+    else:
+        vocab_sizes = [vocab_size]
+
+    results = {str(vocab_size): None for vocab_size in vocab_sizes}
+    for vocab_size in vocab_sizes:
+        logger.info(f"Training tokenizer with vocab size: {vocab_size}")
+        unk_counts = train_spm_tokenizer(path_to_augmented_csv, vocab_size=vocab_size)
+        results[str(vocab_size)] = unk_counts
+        logger.info(f"Tokenizer trained with vocab size: {vocab_size}")
+        logger.info(f"UNK counts: {unk_counts}")
+
+    if generate_stats:
+        logger.info("Generating stats...")
+        write_dict_to_csv2(results, '../stats/tokenizer_stats.csv', 'vocab_size,unk_count')
+        logger.info("Stats generated. Saved at stats/tokenizer_stats.csv")
 
 
 @app.command()

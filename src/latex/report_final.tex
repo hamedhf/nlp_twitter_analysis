@@ -88,10 +88,8 @@
         \dirtree{%
             .1 rootfolder.
             .2 data.
-            .3 raw.
             .3 clean.
-            .3 wordbroken.
-            .3 sentencebroken.
+            .3 ....
             .3 augment.
             .3 split.\dotfill\begin{minipage}[t]{5cm}
                                  parsbert finetune data
@@ -111,6 +109,9 @@
             \end{minipage}.
             .3 word2vec.\dotfill\begin{minipage}[t]{5cm}
                                     word2vec model
+            \end{minipage}.
+            .3 spm\_tokenizer.\dotfill\begin{minipage}[t]{5cm}
+                                          sentencepiece tokenizer model
             \end{minipage}.
             .2 src.
             .3 latex.\dotfill\begin{minipage}[t]{5cm}
@@ -140,6 +141,9 @@
             \end{minipage}.
             .4 word2vec.py.\dotfill\begin{minipage}[t]{5cm}
                                        train word2vec model
+            \end{minipage}.
+            .4 sentencepiece.py.\dotfill\begin{minipage}[t]{5cm}
+                                        training tokenizer
             \end{minipage}.
             .4 gpt2.py.\dotfill\begin{minipage}[t]{5cm}
                                    train gpt2 model
@@ -256,6 +260,20 @@
     \begin{center}
         \includegraphics[width=1\textwidth]{\rootDir/stats/word2vec_similar.png}
     \end{center}
+
+    \section{Tokenizer with byte pair encoding}\label{sec:tokenizer-with-byte-pair-encoding}
+    With the help of sentencepiece library we trained a tokenizer with byte pair encoding. The implementation is in src\slash utils\slash sentencepiece.py file. We used the augmented data for training the tokenizer. The tokenizer is saved in models\slash spm\_tokenizer\slash tokenizer(vocab\_size).model file.
+    
+    We have trained the tokenizer with different vocab\_size and tested them with this metric that how many of the words in the test set will be mapped to UNK token. The results are shown in the following table.
+    \begin{center}
+        \csvreader[tabular=|c|c|,
+        table head=\hline vocab\_size & UNK count\\ \hline,
+        late after line=\\ \hline
+        ]{\rootDir/stats/tokenizer_stats.csv}{}{
+            \csvcoli & \csvcolii
+        }
+    \end{center}
+    As you can see, larger vocab\_size leads to less UNK count on the test set.
 
     \section{Language Model}\label{sec:language-model}
     We used huggingface transformers library for training the language model. The implementation is in src\slash utils\slash gpt2.py file. We used HooshvareLab/gpt2-fa model for this purpose. The model is trained on huge Persian corpus and it is available at \url{https://huggingface.co/HooshvareLab/gpt2-fa}. Use of pretained model helps us gain better results with less data.
@@ -410,6 +428,7 @@
     \begin{itemize}
     \item \url{https://github.com/hooshvare/parsgpt}
     \item \url{https://huggingface.co/HooshvareLab/bert-fa-base-uncased}
+    \item \url{https://platform.openai.com/docs/introduction}
     \item \url{https://www.geeksforgeeks.org/python-word-embedding-using-word2vec}
     \item \url{https://www.kaggle.com/code/akshat0007/bert-for-sequence-classification}
     \item \url{https://www.kaggle.com/code/nulldata/fine-tuning-gpt-2-to-generate-netlfix-descriptions}

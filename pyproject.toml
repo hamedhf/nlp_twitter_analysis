@@ -30,6 +30,7 @@ wget = "^3.2"
 seaborn = "^0.12.2"
 arabic-reshaper = "^3.0.0"
 python-bidi = "^0.4.2"
+sentencepiece = "^0.1.99"
 
 
 [build-system]

@@ -124,6 +124,14 @@ example: python src/main.py get-most-similar-words all سیاست --topn 10
 python src/main.py get-word2vec-stats
 ```
 
+#### train sentencepiece tokenizer
+
+```bash
+python src/main.py train-tokenizer path-to-augmented-csv
+example: python src/main.py train-tokenizer ../data/augment/augmented_2023-06-02-10-27-57.csv
+example: python src/main.py train-tokenizer ../data/augment/augmented_2023-06-02-10-27-57.csv --vocab-size 2000
+```
+
 #### fine tuning gpt2
 
 ```bash
