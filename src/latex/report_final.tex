@@ -162,6 +162,12 @@
 
 
     \section{Data Collection}\label{sec:data-collection}
+    \subsection{Tools}\label{subsec:tools}
+    Selenium is an invaluable tool for our project, as it enables us to efficiently crawl data from Twitter. With its web automation capabilities, Selenium allows us to interact with the Twitter website programmatically, replicating user actions and extracting the data we need. We can navigate through Twitter's pages, search for specific tweets, scrape user profiles, and extract information such as tweets, hashtags, user handles, and timestamps. The flexibility of Selenium enables us to dynamically interact with Twitter's interface, making it ideal for our project's data crawling requirements. By leveraging Selenium's power, we can gather and analyze Twitter data in real-time, facilitating tasks such as sentiment analysis, social network analysis, and trend monitoring.
+
+    \subsection{Process}\label{subsec:process}
+    It is worth to mention that this part was one of the most time consuming and hardest parts of the project. Because we had to mock the behavior of a real user and navigate through the pages.
+
     We used selenium $>=$ 4.6.0 for collecting data from Twitter. This tool helps us to bring up an actual browser and navigate through the pages. Note that you should have Chrome installed on your system for this to work. Then you can simply install other dependencies form pyproject.toml file using poetry or other package managers.
     The crawler script reads the users.csv file and for each user, it navigates to the user's profile and collects the tweets. The tweets are stored in a file named unlabeled.db inside data\slash raw folder. Then labeling script uses this and with the help of ChatGPT model, it generates the labels for each tweet and stores them in data\slash raw\slash labeled-run-date.csv file.
 
@@ -321,6 +327,9 @@
         \includegraphics[width=1\textwidth]{\rootDir/src/latex/images/gpt2_generation.png}
     \end{center}
     It is important to note that we should set max\_seq length according to the common length of the tweets in the dataset. If we set it a large number, then model will be overfitted on PAD token and it will generate a lot of PAD tokens.
+
+    \section{Model Selection}\label{sec:model-selection}
+    We have maily worked on 2 models for classification, one was parsbert v2 and other one is an LSTM based model. Unfortunately we could not use the LSTM based model because of the lack of time. We have finetuned the parsbert v2 model on the augmented data. The implementation of the LSTM based model is in src\slash models\slash lstm.py file. The implementation of the parsbert v2 model is in src\slash models\slash parsbert.py file. In next sections we will explain the parsbert v2 model in more details.
 
     \section{Classification}\label{sec:classification}
     We have utilized the HooshvareLab/bert-fa-base-uncased model(parsbert v2), a variant of BERT specifically designed for Persian language processing, to extract features from the tweets for our text classification task. 
