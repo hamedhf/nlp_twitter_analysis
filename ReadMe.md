@@ -57,6 +57,7 @@ python main.py example-labeling
 python main.py label-data
 ```
 
+#### Data Cleaning(In process of cleaning, we use chatGPT for translating tweets that have more than 40% English tokens. Other details explained in the report)
 ```bash
 python main.py clean-data path-to-labeled-csv
 
